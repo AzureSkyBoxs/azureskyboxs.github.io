@@ -1755,9 +1755,9 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
                   안전 우회 경유점 없음 (최단 경로 진입 가능)
                 </div>
                 <div id="nav-deeplink-bar" class="nav-deeplink-bar">
-                  <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#">T맵 길안내</a>
-                  <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#">네이버 길안내</a>
-                  <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#">카카오 길안내</a>
+                  <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#" target="_blank" rel="noopener">T맵 길안내</a>
+                  <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#" target="_blank" rel="noopener">네이버 길안내</a>
+                  <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#" target="_blank" rel="noopener">카카오 길안내</a>
                 </div>
               </div>
             </div>
@@ -2937,13 +2937,13 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
       if (n0) {
         const dFromStart = haversineMeters(refStart[0], refStart[1], n0.lat, n0.lng);
         const dToEnd = haversineMeters(refEnd[0], refEnd[1], n0.lat, n0.lng);
-        if (dFromStart >= 35.0 && dToEnd >= 35.0 && !viaIndices.includes(0)) {
+        if (dFromStart >= 10.0 && dToEnd >= 10.0 && !viaIndices.includes(0)) {
           viaIndices.unshift(0);
         }
       }
     }
 
-    // If still no intermediate waypoints, only pick guide intersections that are well-separated (>= 45m)
+    // If still no intermediate waypoints, pick guide intersections along safeNodeIds
     const startCandIdx = isVirtualStart ? 0 : 1;
     if (viaIndices.length === 0 && last > startCandIdx && refStart && refEnd) {
       for (let j = startCandIdx; j < last && viaIndices.length < 3; j++) {
@@ -2951,7 +2951,7 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
         if (!nMid) continue;
         const dStart = haversineMeters(refStart[0], refStart[1], nMid.lat, nMid.lng);
         const dEnd = haversineMeters(refEnd[0], refEnd[1], nMid.lat, nMid.lng);
-        if (dStart >= 45.0 && dEnd >= 45.0) {
+        if (dStart >= 12.0 && dEnd >= 12.0) {
           if (
             viaIndices.length === 0 ||
             haversineMeters(
@@ -2959,15 +2959,29 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
               index.nodeMap.get(safeNodeIds[viaIndices[viaIndices.length - 1]]).lng,
               nMid.lat,
               nMid.lng
-            ) >= 50.0
+            ) >= 25.0
           ) {
             viaIndices.push(j);
           }
         }
       }
+      // Relaxed fallback if intersections are very close together
+      if (viaIndices.length === 0) {
+        const midIdx = Math.floor((startCandIdx + last - 1) / 2);
+        if (midIdx >= startCandIdx && midIdx < last) {
+          const nMid = index.nodeMap.get(safeNodeIds[midIdx]);
+          if (nMid) {
+            const dStart = haversineMeters(refStart[0], refStart[1], nMid.lat, nMid.lng);
+            const dEnd = haversineMeters(refEnd[0], refEnd[1], nMid.lat, nMid.lng);
+            if (dStart >= 4.0 && dEnd >= 4.0) {
+              viaIndices.push(midIdx);
+            }
+          }
+        }
+      }
     }
 
-    const rawViaList = viaIndices.slice(0, 5).map((j) => {
+    const viaList = viaIndices.slice(0, 5).map((j) => {
       const n = index.nodeMap.get(safeNodeIds[j]);
       return {
         nodeId: n.id,
@@ -2976,19 +2990,22 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
       };
     });
 
-    // Deduplicate and enforce >= 35m separation from start, goal, and previous waypoints
-    const viaList = [];
-    for (let i = 0; i < rawViaList.length; i++) {
-      const cand = rawViaList[i];
-      if (refStart && haversineMeters(refStart[0], refStart[1], cand.lat, cand.lng) < 35.0) continue;
-      if (refEnd && haversineMeters(refEnd[0], refEnd[1], cand.lat, cand.lng) < 35.0) continue;
-      if (
-        viaList.length > 0 &&
-        haversineMeters(viaList[viaList.length - 1].lat, viaList[viaList.length - 1].lng, cand.lat, cand.lng) < 35.0
-      ) {
-        continue;
+    // Polyline geometry fallback: when route traverses 1-2 curved links without intermediate nodes
+    if (viaList.length === 0 && Array.isArray(vehCoords) && vehCoords.length >= 2) {
+      const polyLen = polylineLengthM(vehCoords);
+      if (polyLen >= 20.0) {
+        const fracs = polyLen >= 90.0 ? [0.35, 0.7] : [0.5];
+        fracs.forEach((f, idx) => {
+          const pt = samplePointAlongPolyline(vehCoords, f);
+          if (pt) {
+            viaList.push({
+              nodeId: `경로경유${idx + 1}`,
+              lat: pt[0],
+              lng: pt[1]
+            });
+          }
+        });
       }
-      viaList.push(cand);
     }
 
     return viaList;
@@ -4576,13 +4593,11 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
     const goalObj = { lat: Number(goalLat), lng: Number(goalLng) };
 
     // 1. T맵(tmap://route):
-    //    - 시작점(rStX/rStY 및 선택출발지 isStartAnchor) 강제 주입을 제거하고,
-    //      산출된 안전 우회 경유지(rV1..rV5)와 최종 도착지(rGoName/rGoX/rGoY)만 유지하여 전달
-    //    - 구형/신형 파라미터(rV1X + via1x, rGoX + goalx) 이중 전달을 제거하고 단일 표준만 사용
-    //    - 출발지·도착지·경유지 상호 간 근접 중복을 filterDistinctWaypoints로 필터링
+    //    - 시작점(rStX/rStY, startx/starty 및 선택출발지 isStartAnchor) 강제 주입을 제거하고,
+    //      산출된 안전 우회 경유지(rV1..rV5 / via1..via5)와 최종 도착지(rGo / goal)를 유지하여 전달 (iOS/Android 양쪽 규격 모두 호환)
     const prioritizedDetours =
       vias.length > 2 ? [vias[0], vias[vias.length - 1], ...vias.slice(1, -1)] : vias.slice();
-    const tmapVias = filterDistinctWaypoints(prioritizedDetours, originObj, goalObj, 50.0, 5);
+    const tmapVias = filterDistinctWaypoints(prioritizedDetours, originObj, goalObj, 6.0, 5);
 
     if (tmapEl) {
       const viaParams = tmapVias
@@ -4591,17 +4606,18 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
           const vName = encodeURIComponent(label);
           const vx = Number(v.lng).toFixed(6);
           const vy = Number(v.lat).toFixed(6);
-          return `&rV${idx + 1}Name=${vName}&rV${idx + 1}X=${vx}&rV${idx + 1}Y=${vy}`;
+          return `&rV${idx + 1}Name=${vName}&rV${idx + 1}X=${vx}&rV${idx + 1}Y=${vy}&via${idx + 1}name=${vName}&via${idx + 1}x=${vx}&via${idx + 1}y=${vy}`;
         })
         .join('');
       tmapEl.href =
         `tmap://route?rGoName=${encodeURIComponent(goalName)}&rGoX=${goalLng}&rGoY=${goalLat}` +
+        `&goalname=${encodeURIComponent(goalName)}&goalx=${goalLng}&goaly=${goalLat}` +
         `${viaParams}&reqCoordType=WGS84&resCoordType=WGS84`;
     }
 
     // 2. 네이버지도 & 카카오맵 공통:
     //    시작점 강제 경유지(출발진입점) 주입을 제거하고, 실제 안전 경유지(vias)와 도착지만 전달
-    const routeVias = filterDistinctWaypoints(vias, originObj, goalObj, 45.0, 5);
+    const routeVias = filterDistinctWaypoints(vias, originObj, goalObj, 6.0, 5);
 
     if (viaSummaryEl) {
       const startSummary = `<strong>출발지:</strong> ${startName}(${Number(startLat).toFixed(4)}, ${Number(startLng).toFixed(4)})`;
