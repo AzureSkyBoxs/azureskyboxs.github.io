@@ -1371,12 +1371,14 @@ body.pick-start-mode #map {
    * 가장 가까운 도로 선형(edge polyline) 위의 투영점(projPt)에서 양방향 정점으로 이어지는
    * 가상 출발 간선(virtualEdges)을 생성합니다.
    */
-  function projectPointToRoad(index, lat, lng) {
+  function projectPointToRoad(index, lat, lng, threshold, mode) {
     const startPt = [Number(Number(lat).toFixed(6)), Number(Number(lng).toFixed(6))];
     if (!index || !index.paths || index.paths.length === 0) {
       return null;
     }
 
+    const thr = Number(threshold) || 2.2;
+    const evalMode = mode || 'vworld_api';
     const kx = 111320.0 * Math.cos((lat * Math.PI) / 180.0);
     const ky = 110540.0;
 
@@ -1386,9 +1388,17 @@ body.pick-start-mode #map {
     let bestProjLng = lng;
     let bestDistM = Infinity;
 
+    let bestPassEdge = null;
+    let bestPassSegIdx = 0;
+    let bestPassProjLat = lat;
+    let bestPassProjLng = lng;
+    let bestPassDistM = Infinity;
+
     for (let i = 0; i < index.paths.length; i++) {
       const edge = index.paths[i];
       const coords = edge.coords || [];
+      const w = getEdgeWidth(edge, evalMode);
+      const isPassableWidth = w !== null && w >= thr;
       for (let k = 0; k < coords.length - 1; k++) {
         const A = coords[k];
         const B = coords[k + 1];
@@ -1410,7 +1420,22 @@ body.pick-start-mode #map {
           bestProjLat = pLat;
           bestProjLng = pLng;
         }
+        if (isPassableWidth && dM < bestPassDistM) {
+          bestPassDistM = dM;
+          bestPassEdge = edge;
+          bestPassSegIdx = k;
+          bestPassProjLat = pLat;
+          bestPassProjLng = pLng;
+        }
       }
+    }
+
+    if (bestPassEdge && bestPassDistM <= Math.max(45.0, bestDistM + 25.0)) {
+      bestEdge = bestPassEdge;
+      bestSegIdx = bestPassSegIdx;
+      bestProjLat = bestPassProjLat;
+      bestProjLng = bestPassProjLng;
+      bestDistM = bestPassDistM;
     }
 
     if (!bestEdge) return null;
@@ -1521,7 +1546,13 @@ body.pick-start-mode #map {
       Number.isFinite(Number(o.startLat)) &&
       Number.isFinite(Number(o.startLng))
     ) {
-      const proj = projectPointToRoad(index, Number(o.startLat), Number(o.startLng));
+      const proj = projectPointToRoad(
+        index,
+        Number(o.startLat),
+        Number(o.startLng),
+        Number(o.threshold) || 2.2,
+        o.mode || 'vworld_api'
+      );
       if (proj) {
         return {
           entryNodeIds: [USER_START_ID],
@@ -1883,80 +1914,134 @@ body.pick-start-mode #map {
     return out.reverse();
   }
 
+  function samplePointAlongPolyline(coords, frac) {
+    if (!Array.isArray(coords) || coords.length < 2) return null;
+    const segLens = [];
+    let total = 0.0;
+    for (let i = 0; i < coords.length - 1; i++) {
+      const d = haversineMeters(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
+      segLens.push(d);
+      total += d;
+    }
+    if (total < 15.0) return null;
+    const target = total * Math.max(0.1, Math.min(0.9, frac));
+    let acc = 0.0;
+    for (let i = 0; i < segLens.length; i++) {
+      const seg = segLens[i];
+      if (acc + seg >= target || i === segLens.length - 1) {
+        const t = seg > 1e-6 ? Math.max(0.0, Math.min(1.0, (target - acc) / seg)) : 0.0;
+        const lat = coords[i][0] + t * (coords[i + 1][0] - coords[i][0]);
+        const lng = coords[i][1] + t * (coords[i + 1][1] - coords[i][1]);
+        return [Number(lat.toFixed(6)), Number(lng.toFixed(6))];
+      }
+      acc += seg;
+    }
+    return null;
+  }
+
   /**
    * 자체 방식 B 안전 경로(safeNodeIds)와 일반 최단거리 경로를 비교하여
-   * TMAP passList 및 내비게이션 앱(네이버·카카오)에 전달할 안전 우회 경유점(최대 5곳) 추출
+   * TMAP passList 및 내비게이션 앱(티맵·네이버·카카오)에 전달할 안전 우회/안내 경유점(최대 5곳) 추출
    */
-  function extractNavVia(index, rawSafeNodeIds) {
+  function extractNavVia(index, rawSafeNodeIds, vehCoords, startPoint, stagingPoint) {
+    const isVirtualStart = Array.isArray(rawSafeNodeIds) && rawSafeNodeIds[0] === USER_START_ID;
     const safeNodeIds = (rawSafeNodeIds || []).filter((id) => index.nodeMap.has(id));
-    if (!safeNodeIds || safeNodeIds.length <= 2) return [];
     const last = safeNodeIds.length - 1;
-    const safeSet = new Set(safeNodeIds);
-    const pos = [0];
+    const viaIndices = [];
 
-    function buildMimic() {
-      let out = [safeNodeIds[0]];
-      const pts = [...pos, last];
-      for (let k = 0; k + 1 < pts.length; k++) {
-        const seg = shortestUnconstrainedNodeIds(index, safeNodeIds[pts[k]], safeNodeIds[pts[k + 1]]);
-        if (!seg) return null;
-        out = out.concat(seg.slice(1));
-      }
-      return out;
-    }
+    if (safeNodeIds.length >= 3) {
+      const safeSet = new Set(safeNodeIds);
+      const pos = [0];
 
-    function deviatesFromSafe(mimicIds) {
-      if (!mimicIds) return true;
-      for (let i = 0; i < mimicIds.length; i++) {
-        if (!safeSet.has(mimicIds[i])) return true;
-      }
-      return false;
-    }
-
-    let mimic = buildMimic();
-    let isBad = deviatesFromSafe(mimic);
-
-    while (isBad && pos.length < 5) {
-      const onMimic = new Set(mimic || []);
-      const mimicNodes = (mimic || []).map((id) => index.nodeMap.get(id)).filter(Boolean);
-      let bestJ = -1;
-      let bestDist = 5.0;
-
-      for (let j = 1; j < last; j++) {
-        const candId = safeNodeIds[j];
-        if (onMimic.has(candId) || pos.includes(j)) continue;
-        const candNode = index.nodeMap.get(candId);
-        if (!candNode) continue;
-        let minD = Infinity;
-        for (let q = 0; q < mimicNodes.length; q++) {
-          const d = haversineMeters(candNode.lat, candNode.lng, mimicNodes[q].lat, mimicNodes[q].lng);
-          if (d < minD) minD = d;
+      function buildMimic() {
+        let out = [safeNodeIds[0]];
+        const pts = [...pos, last];
+        for (let k = 0; k + 1 < pts.length; k++) {
+          const seg = shortestUnconstrainedNodeIds(index, safeNodeIds[pts[k]], safeNodeIds[pts[k + 1]]);
+          if (!seg) return null;
+          out = out.concat(seg.slice(1));
         }
-        if (minD > bestDist) {
-          bestDist = minD;
-          bestJ = j;
-        }
+        return out;
       }
-      if (bestJ < 0) break;
-      pos.push(bestJ);
-      pos.sort((a, b) => a - b);
-      mimic = buildMimic();
-      isBad = deviatesFromSafe(mimic);
+
+      function deviatesFromSafe(mimicIds) {
+        if (!mimicIds) return true;
+        for (let i = 0; i < mimicIds.length; i++) {
+          if (!safeSet.has(mimicIds[i])) return true;
+        }
+        return false;
+      }
+
+      let mimic = buildMimic();
+      let isBad = deviatesFromSafe(mimic);
+
+      while (isBad && pos.length < 5) {
+        const onMimic = new Set(mimic || []);
+        const mimicNodes = (mimic || []).map((id) => index.nodeMap.get(id)).filter(Boolean);
+        let bestJ = -1;
+        let bestDist = 5.0;
+
+        for (let j = 1; j < last; j++) {
+          const candId = safeNodeIds[j];
+          if (onMimic.has(candId) || pos.includes(j)) continue;
+          const candNode = index.nodeMap.get(candId);
+          if (!candNode) continue;
+          let minD = Infinity;
+          for (let q = 0; q < mimicNodes.length; q++) {
+            const d = haversineMeters(candNode.lat, candNode.lng, mimicNodes[q].lat, mimicNodes[q].lng);
+            if (d < minD) minD = d;
+          }
+          if (minD > bestDist) {
+            bestDist = minD;
+            bestJ = j;
+          }
+        }
+        if (bestJ < 0) break;
+        pos.push(bestJ);
+        pos.sort((a, b) => a - b);
+        mimic = buildMimic();
+        isBad = deviatesFromSafe(mimic);
+      }
+
+      pos.forEach((idx) => {
+        if (idx > 0 && idx < last) viaIndices.push(idx);
+      });
     }
 
-    // intermediate indices excluding 0 (startNode) and last (stagingNode)
-    const viaIndices = pos.filter((idx) => idx > 0 && idx < last);
+    const refStart =
+      Array.isArray(startPoint) && startPoint.length === 2
+        ? startPoint
+        : safeNodeIds.length > 0 && index.nodeMap.get(safeNodeIds[0])
+        ? [index.nodeMap.get(safeNodeIds[0]).lat, index.nodeMap.get(safeNodeIds[0]).lng]
+        : null;
+    const refEnd =
+      Array.isArray(stagingPoint) && stagingPoint.length === 2
+        ? stagingPoint
+        : safeNodeIds.length > 0 && index.nodeMap.get(safeNodeIds[last])
+        ? [index.nodeMap.get(safeNodeIds[last]).lat, index.nodeMap.get(safeNodeIds[last]).lng]
+        : null;
 
-    // If safe path equals shortest path but has intermediate intersections, pick up to 2 guide intersections (>= 40m from ends)
-    if (viaIndices.length === 0 && safeNodeIds.length >= 3) {
-      const nStart = index.nodeMap.get(safeNodeIds[0]);
-      const nEnd = index.nodeMap.get(safeNodeIds[last]);
-      for (let j = 1; j < last && viaIndices.length < 2; j++) {
+    // When starting from an exact user coordinate (__USER_START__), safeNodeIds[0] is the first entered intersection
+    if (isVirtualStart && safeNodeIds.length >= 2 && refStart && refEnd) {
+      const n0 = index.nodeMap.get(safeNodeIds[0]);
+      if (n0) {
+        const dFromStart = haversineMeters(refStart[0], refStart[1], n0.lat, n0.lng);
+        const dToEnd = haversineMeters(refEnd[0], refEnd[1], n0.lat, n0.lng);
+        if (dFromStart >= 10.0 && dToEnd >= 10.0 && !viaIndices.includes(0)) {
+          viaIndices.unshift(0);
+        }
+      }
+    }
+
+    // If still no intermediate waypoints, pick guide intersections along safeNodeIds
+    const startCandIdx = isVirtualStart ? 0 : 1;
+    if (viaIndices.length === 0 && last > startCandIdx && refStart && refEnd) {
+      for (let j = startCandIdx; j < last && viaIndices.length < 3; j++) {
         const nMid = index.nodeMap.get(safeNodeIds[j]);
-        if (!nMid || !nStart || !nEnd) continue;
-        const dStart = haversineMeters(nStart.lat, nStart.lng, nMid.lat, nMid.lng);
-        const dEnd = haversineMeters(nEnd.lat, nEnd.lng, nMid.lat, nMid.lng);
-        if (dStart >= 35 && dEnd >= 35) {
+        if (!nMid) continue;
+        const dStart = haversineMeters(refStart[0], refStart[1], nMid.lat, nMid.lng);
+        const dEnd = haversineMeters(refEnd[0], refEnd[1], nMid.lat, nMid.lng);
+        if (dStart >= 12.0 && dEnd >= 12.0) {
           if (
             viaIndices.length === 0 ||
             haversineMeters(
@@ -1964,15 +2049,29 @@ body.pick-start-mode #map {
               index.nodeMap.get(safeNodeIds[viaIndices[viaIndices.length - 1]]).lng,
               nMid.lat,
               nMid.lng
-            ) >= 50
+            ) >= 25.0
           ) {
             viaIndices.push(j);
           }
         }
       }
+      // Relaxed fallback if intersections are very close together
+      if (viaIndices.length === 0) {
+        const midIdx = Math.floor((startCandIdx + last - 1) / 2);
+        if (midIdx >= startCandIdx && midIdx < last) {
+          const nMid = index.nodeMap.get(safeNodeIds[midIdx]);
+          if (nMid) {
+            const dStart = haversineMeters(refStart[0], refStart[1], nMid.lat, nMid.lng);
+            const dEnd = haversineMeters(refEnd[0], refEnd[1], nMid.lat, nMid.lng);
+            if (dStart >= 4.0 && dEnd >= 4.0) {
+              viaIndices.push(midIdx);
+            }
+          }
+        }
+      }
     }
 
-    return viaIndices.slice(0, 5).map((j) => {
+    const viaList = viaIndices.slice(0, 5).map((j) => {
       const n = index.nodeMap.get(safeNodeIds[j]);
       return {
         nodeId: n.id,
@@ -1980,6 +2079,26 @@ body.pick-start-mode #map {
         lng: Number(n.lng.toFixed(6))
       };
     });
+
+    // Polyline geometry fallback: when route traverses 1-2 curved links without intermediate nodes
+    if (viaList.length === 0 && Array.isArray(vehCoords) && vehCoords.length >= 2) {
+      const polyLen = polylineLengthM(vehCoords);
+      if (polyLen >= 20.0) {
+        const fracs = polyLen >= 90.0 ? [0.35, 0.7] : [0.5];
+        fracs.forEach((f, idx) => {
+          const pt = samplePointAlongPolyline(vehCoords, f);
+          if (pt) {
+            viaList.push({
+              nodeId: `경로경유${idx + 1}`,
+              lat: pt[0],
+              lng: pt[1]
+            });
+          }
+        });
+      }
+    }
+
+    return viaList;
   }
 
   function buildRouteSeq(startPoint, navVia, stagingPoint) {
@@ -2007,7 +2126,19 @@ body.pick-start-mode #map {
   }
 
   function attachTimingAndNavFields(index, baseRoute, vehChain) {
-    const navVia = extractNavVia(index, vehChain ? vehChain.nodeIds : []);
+    const vehCoords =
+      Array.isArray(baseRoute.vehicleRouteCoords) && baseRoute.vehicleRouteCoords.length >= 2
+        ? baseRoute.vehicleRouteCoords
+        : vehChain
+        ? vehChain.coords
+        : [];
+    const navVia = extractNavVia(
+      index,
+      vehChain ? vehChain.nodeIds : [],
+      vehCoords,
+      baseRoute.startPoint,
+      baseRoute.stagingPoint
+    );
     const routeSeq = buildRouteSeq(baseRoute.startPoint, navVia, baseRoute.stagingPoint);
     const villageDriveSec = vehChain ? vehChain.driveSec : Math.round((baseRoute.vehicleDistanceM || 0) / (15 / 3.6));
     const hoseDist = baseRoute.hoseDistanceM || 0;
@@ -2556,7 +2687,7 @@ body.pick-start-mode #map {
     if (!currentIndex) return;
     const proj =
       window.FirewayGraphEngine && window.FirewayGraphEngine.projectPointToRoad
-        ? window.FirewayGraphEngine.projectPointToRoad(currentIndex, lat, lng)
+        ? window.FirewayGraphEngine.projectPointToRoad(currentIndex, lat, lng, currentThreshold, 'vworld_api')
         : null;
     const roadW = proj && proj.edge ? window.FirewayGraphEngine.getEdgeWidth(proj.edge, 'vworld_api') : null;
     customStartPoint = {
@@ -2572,7 +2703,9 @@ body.pick-start-mode #map {
     useStationStart = !useStationStart;
     updateStartPointUI();
     renderStartMarker();
-    if (!customStartPoint && routeSelectStep === 'idle') {
+    if (lastMission && lastMission.found) {
+      updateNavigationDeeplinks(lastMission);
+    } else if (!customStartPoint && routeSelectStep === 'idle') {
       startRouteSearchFlow();
     }
   }
@@ -3062,31 +3195,71 @@ body.pick-start-mode #map {
     const viaSummaryEl = document.getElementById('nav-via-summary');
     if (!route || !route.found || !route.stagingPoint) return;
 
+    const st = window.FirewayGraphEngine && window.FirewayGraphEngine.FIRE_STATION;
+    const rawStartPt =
+      Array.isArray(route.startPoint) && route.startPoint.length === 2
+        ? route.startPoint
+        : customStartPoint
+        ? [customStartPoint.lat, customStartPoint.lng]
+        : route.stagingPoint;
+
+    let startLat = Number(rawStartPt[0]).toFixed(6);
+    let startLng = Number(rawStartPt[1]).toFixed(6);
+    let startName = route.isExactStart ? '선택출발지' : `출발거점(${route.startNodeId || '출발'})`;
+
     const goalLat = Number(route.stagingPoint[0]).toFixed(6);
     const goalLng = Number(route.stagingPoint[1]).toFixed(6);
     const goalName = route.directVehicleAccess
       ? `화점진입(${route.stagingNodeId})`
       : `소방차하차거점(${route.stagingNodeId})`;
-    const vias = Array.isArray(route.navVia) ? route.navVia.slice(0, 5) : [];
+
+    const baseVias = Array.isArray(route.navVia) ? route.navVia.slice(0, 5) : [];
+    const vias = [];
+    if (useStationStart && st) {
+      startLat = Number(st.lat).toFixed(6);
+      startLng = Number(st.lng).toFixed(6);
+      startName = st.name || '의령소방서';
+      vias.push({
+        nodeId: '마을출발지',
+        lat: Number(rawStartPt[0]),
+        lng: Number(rawStartPt[1])
+      });
+    }
+    baseVias.forEach((v) => {
+      if (vias.length < 5) vias.push(v);
+    });
 
     if (viaSummaryEl) {
+      const startSummary = `<strong>출발지:</strong> ${startName}(${Number(startLat).toFixed(4)}, ${Number(startLng).toFixed(4)})`;
+      const goalSummary = `<strong>도착지:</strong> ${goalName}`;
       if (vias.length > 0) {
-        const viaLabels = vias.map((v, idx) => `경유${idx + 1}(${v.nodeId})`).join(' → ');
-        viaSummaryEl.innerHTML = `<strong>안전 우회 경유지 ${vias.length}개소:</strong> ${viaLabels} <span class="muted-text">(폭원 미달·회전불가 구간 자동 우회)</span>`;
+        const viaLabels = vias
+          .map((v, idx) => `경유${idx + 1}(${v.nodeId}: ${Number(v.lat).toFixed(4)},${Number(v.lng).toFixed(4)})`)
+          .join(' → ');
+        viaSummaryEl.innerHTML = `${startSummary} → <strong>경유지 ${vias.length}개소:</strong> ${viaLabels} → ${goalSummary}`;
       } else {
-        viaSummaryEl.textContent = '안전 우회 경유점 없음 (일반 최단 경로와 소방차 안전 진입 경로 일치)';
+        viaSummaryEl.innerHTML = `${startSummary} → ${goalSummary} <span class="muted-text">(동일 지점 또는 단거리 직결)</span>`;
       }
     }
 
     if (tmapEl) {
-      const viaParams = vias
-        .slice(0, 2)
-        .map(
-          (v, idx) =>
-            `&via${idx + 1}name=${encodeURIComponent('안전경유' + (idx + 1))}&via${idx + 1}x=${Number(v.lng).toFixed(6)}&via${idx + 1}y=${Number(v.lat).toFixed(6)}`
-        )
+      // Prioritize first and last detour waypoints into rV1/rV2 when >2 waypoints exist
+      const orderedTmapVias =
+        vias.length > 2 ? [vias[0], vias[vias.length - 1], ...vias.slice(1, -1)].slice(0, 5) : vias.slice(0, 5);
+      const viaParams = orderedTmapVias
+        .map((v, idx) => {
+          const vName = encodeURIComponent(`안전경유${idx + 1}(${v.nodeId})`);
+          const vx = Number(v.lng).toFixed(6);
+          const vy = Number(v.lat).toFixed(6);
+          return `&rV${idx + 1}Name=${vName}&rV${idx + 1}X=${vx}&rV${idx + 1}Y=${vy}&via${idx + 1}name=${vName}&via${idx + 1}x=${vx}&via${idx + 1}y=${vy}`;
+        })
         .join('');
-      tmapEl.href = `tmap://route?goalname=${encodeURIComponent(goalName)}&goalx=${goalLng}&goaly=${goalLat}${viaParams}`;
+      tmapEl.href =
+        `tmap://route?rStName=${encodeURIComponent(startName)}&rStX=${startLng}&rStY=${startLat}` +
+        `&startname=${encodeURIComponent(startName)}&startx=${startLng}&starty=${startLat}` +
+        `&rGoName=${encodeURIComponent(goalName)}&rGoX=${goalLng}&rGoY=${goalLat}` +
+        `&goalname=${encodeURIComponent(goalName)}&goalx=${goalLng}&goaly=${goalLat}` +
+        `${viaParams}&reqCoordType=WGS84&resCoordType=WGS84`;
     }
 
     if (naverEl) {
@@ -3096,12 +3269,15 @@ body.pick-start-mode #map {
             `&v${idx + 1}lat=${Number(v.lat).toFixed(6)}&v${idx + 1}lng=${Number(v.lng).toFixed(6)}&v${idx + 1}name=${encodeURIComponent('안전경유' + (idx + 1))}`
         )
         .join('');
-      naverEl.href = `nmap://navigation?dlat=${goalLat}&dlng=${goalLng}&dname=${encodeURIComponent(goalName)}${vParams}&appname=fireway119.pages.dev`;
+      // Use nmap://route/car (supports slat/slng start + v1..v5 waypoints + dlat/dlng destination; legacy nmap://navigation only supports destination)
+      naverEl.href =
+        `nmap://route/car?slat=${startLat}&slng=${startLng}&sname=${encodeURIComponent(startName)}` +
+        `&dlat=${goalLat}&dlng=${goalLng}&dname=${encodeURIComponent(goalName)}${vParams}&appname=fireway119.pages.dev`;
     }
 
     if (kakaoEl) {
       const kVias = vias.map((v) => `&vp=${Number(v.lat).toFixed(6)},${Number(v.lng).toFixed(6)}`).join('');
-      kakaoEl.href = `kakaomap://route?ep=${goalLat},${goalLng}${kVias}&by=car`;
+      kakaoEl.href = `kakaomap://route?sp=${startLat},${startLng}&ep=${goalLat},${goalLng}${kVias}&by=car`;
     }
   }
 
@@ -3145,6 +3321,7 @@ body.pick-start-mode #map {
   async function requestAndRenderExternalRoute(route, preferRouter) {
     if (!route || !route.found || !trunkRouteLayerGroup) return;
     trunkRouteLayerGroup.clearLayers();
+    updateNavigationDeeplinks(route);
 
     const badgeEl = document.getElementById('route-engine-badge');
     const timeEl = document.getElementById('metric-total-time');
