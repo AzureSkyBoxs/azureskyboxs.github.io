@@ -1755,9 +1755,9 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
                   안전 우회 경유점 없음 (최단 경로 진입 가능)
                 </div>
                 <div id="nav-deeplink-bar" class="nav-deeplink-bar">
-                  <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#" target="_blank" rel="noopener">T맵 길안내</a>
-                  <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#" target="_blank" rel="noopener">네이버 길안내</a>
-                  <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#" target="_blank" rel="noopener">카카오 길안내</a>
+                  <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#">T맵 길안내</a>
+                  <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#">네이버 길안내</a>
+                  <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#">카카오 길안내</a>
                 </div>
               </div>
             </div>
@@ -4049,6 +4049,17 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
           }
         });
       }
+      const btnTmapApi = el.querySelector('[data-popup-action="run-tmap-api"]');
+      if (btnTmapApi) {
+        btnTmapApi.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          map.closePopup(popup);
+          if (lastMission && lastMission.found) {
+            requestAndRenderExternalRoute(lastMission, 'tmap');
+          }
+        });
+      }
     });
 
     popup.openOn(map);
@@ -4565,27 +4576,18 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
     const goalObj = { lat: Number(goalLat), lng: Number(goalLng) };
 
     // 1. T맵(tmap://route):
-    //    - tmap://route는 현위치(GPS)를 출발지로 자동 설정하므로 rStX/rStY를 함께 넘기면 rV1(출발경유)과
-    //      100% 동일 좌표가 되어 "선택한 위치가 기존 지점과 중복됩니다" 오류가 발생함 -> rStX/rStY 생략
-    //    - 또한 구형/신형 파라미터(rV1X + via1x, rGoX + goalx) 이중 전달을 제거하고 rGo / rV1..rV5 단일 표준만 사용
-    //    - 농어촌 마을 내 동일 도로링크 매칭 중복을 막기 위해 최소 이격거리 85m(filterDistinctWaypoints) 적용
+    //    - 시작점(rStX/rStY 및 선택출발지 isStartAnchor) 강제 주입을 제거하고,
+    //      산출된 안전 우회 경유지(rV1..rV5)와 최종 도착지(rGoName/rGoX/rGoY)만 유지하여 전달
+    //    - 구형/신형 파라미터(rV1X + via1x, rGoX + goalx) 이중 전달을 제거하고 단일 표준만 사용
+    //    - 출발지·도착지·경유지 상호 간 근접 중복을 filterDistinctWaypoints로 필터링
     const prioritizedDetours =
       vias.length > 2 ? [vias[0], vias[vias.length - 1], ...vias.slice(1, -1)] : vias.slice();
-    const rawTmapCandidates = [
-      {
-        nodeId: startName,
-        lat: Number(startLat),
-        lng: Number(startLng),
-        isStartAnchor: true
-      },
-      ...prioritizedDetours
-    ];
-    const tmapVias = filterDistinctWaypoints(rawTmapCandidates, null, goalObj, 85.0, 5);
+    const tmapVias = filterDistinctWaypoints(prioritizedDetours, originObj, goalObj, 50.0, 5);
 
     if (tmapEl) {
       const viaParams = tmapVias
         .map((v, idx) => {
-          const label = v.isStartAnchor ? `출발경유(${v.nodeId})` : `안전경유${idx + 1}(${v.nodeId})`;
+          const label = `안전경유${idx + 1}(${v.nodeId})`;
           const vName = encodeURIComponent(label);
           const vx = Number(v.lng).toFixed(6);
           const vy = Number(v.lat).toFixed(6);
@@ -4598,33 +4600,19 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
     }
 
     // 2. 네이버지도 & 카카오맵 공통:
-    //    출발지(slat/slng, sp)와 도착지(dlat/dlng, ep)가 명시되므로 출발지·도착지·경유지 간 45m 이상 이격된 지점만 전달
-    const rawRouteCandidates = [];
-    if (!useStationStart) {
-      const entryAnchor = sampleEntryAnchorPoint(
-        route.vehicleRouteCoords,
-        Number(goalLat),
-        Number(goalLng)
-      );
-      if (entryAnchor) {
-        rawRouteCandidates.push(entryAnchor);
-      }
-    }
-    vias.forEach((v) => {
-      rawRouteCandidates.push(v);
-    });
-    const routeVias = filterDistinctWaypoints(rawRouteCandidates, originObj, goalObj, 45.0, 5);
+    //    시작점 강제 경유지(출발진입점) 주입을 제거하고, 실제 안전 경유지(vias)와 도착지만 전달
+    const routeVias = filterDistinctWaypoints(vias, originObj, goalObj, 45.0, 5);
 
     if (viaSummaryEl) {
       const startSummary = `<strong>출발지:</strong> ${startName}(${Number(startLat).toFixed(4)}, ${Number(startLng).toFixed(4)})`;
       const goalSummary = `<strong>도착지:</strong> ${goalName}`;
-      if (routeVias.length > 0) {
-        const viaLabels = routeVias
+      if (tmapVias.length > 0) {
+        const viaLabels = tmapVias
           .map((v, idx) => `경유${idx + 1}(${v.nodeId}: ${Number(v.lat).toFixed(4)},${Number(v.lng).toFixed(4)})`)
           .join(' → ');
-        viaSummaryEl.innerHTML = `${startSummary} → <strong>경유지 ${routeVias.length}개소:</strong> ${viaLabels} → ${goalSummary}`;
+        viaSummaryEl.innerHTML = `${startSummary} → <strong>경유지 ${tmapVias.length}개소:</strong> ${viaLabels} → ${goalSummary}`;
       } else {
-        viaSummaryEl.innerHTML = `${startSummary} → ${goalSummary} <span class="muted-text">(근접 중복 경유지 자동 정리 · 직결 안내)</span>`;
+        viaSummaryEl.innerHTML = `${startSummary} → ${goalSummary} <span class="muted-text">(우회 경유지 없음 · 도착지 직행 안내)</span>`;
       }
     }
 
@@ -4633,7 +4621,7 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
         .map(
           (v, idx) =>
             `&v${idx + 1}lat=${Number(v.lat).toFixed(6)}&v${idx + 1}lng=${Number(v.lng).toFixed(6)}&v${idx + 1}name=${encodeURIComponent(
-              v.nodeId === '출발진입점' ? '출발진입점' : '안전경유' + (idx + 1) + '(' + v.nodeId + ')'
+              '안전경유' + (idx + 1) + '(' + v.nodeId + ')'
             )}`
         )
         .join('');
@@ -5020,14 +5008,21 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
       webUrl = `https://map.kakao.com/link/to/${encodeURIComponent(goalName)},${goalLat},${goalLng}`;
     }
 
+    const tmapActionBtn =
+      appType === 'tmap'
+        ? `<button type="button" class="naver-popup-btn btn-target" data-popup-action="run-tmap-api">
+             🗺 지도 위 T맵 경로 표시
+           </button>`
+        : `<a href="${webUrl}" target="_blank" rel="noopener" class="naver-popup-btn btn-target">
+             🌐 PC 웹 지도 열기
+           </a>`;
+
     const customActionsHtml = `
       <div class="naver-popup-actions">
         <a href="${deeplinkUrl}" class="naver-popup-btn btn-start">
           📱 모바일 앱 실행
         </a>
-        <a href="${webUrl}" target="_blank" rel="noopener" class="naver-popup-btn btn-target">
-          🌐 PC 웹 지도 열기
-        </a>
+        ${tmapActionBtn}
         <button type="button" class="naver-popup-btn full" data-popup-action="copy-deeplink" data-copy-url="${deeplinkUrl.replace(/"/g, '&quot;')}">
           📋 길안내 딥링크 URL 복사
         </button>
@@ -5044,7 +5039,7 @@ body:not(.theme-naver) .naver-popup-btn.btn-target {
         { label: '도착 거점 좌표', value: `${goalLat.toFixed(5)}, ${goalLng.toFixed(5)}` },
         {
           label: '안전 우회 경유지',
-          value: viaCount > 0 ? `${viaCount}개소 (${route.navVia.map((v) => v.nodeId).join(' → ')})` : '직결 진입 (우회 없음)',
+          value: viaCount > 0 ? `${viaCount}개소 (${route.navVia.map((v) => v.nodeId).join(' → ')})` : '우회 경유지 없음 (도착지 직행)',
           full: true
         }
       ],
