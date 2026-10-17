@@ -13,16 +13,45 @@
   <style>
 :root {
   --bg-dark: #0f172a;
-  --bg-panel: #1e293b;
-  --bg-card: #162032;
+  --bg-rail: #090e1a;
+  --bg-panel: rgba(15, 23, 42, 0.96);
+  --bg-card: #1e293b;
+  --bg-subcard: rgba(15, 23, 42, 0.68);
+  --bg-input: #0f172a;
   --border-color: #334155;
   --text-main: #f8fafc;
+  --text-sub: #e2e8f0;
   --text-muted: #94a3b8;
   --accent-red: #ef4444;
   --accent-orange: #f97316;
   --accent-green: #22c55e;
   --accent-blue: #38bdf8;
   --accent-yellow: #eab308;
+  --rail-active-bg: rgba(56, 189, 248, 0.16);
+  --rail-active-color: #38bdf8;
+  --panel-shadow: 6px 0 24px rgba(0, 0, 0, 0.55);
+}
+
+/* 네이버 지도(map.naver.com) 스타일 라이트 클린 테마 */
+body.theme-naver {
+  --bg-dark: #f1f5f9;
+  --bg-rail: #ffffff;
+  --bg-panel: rgba(255, 255, 255, 0.98);
+  --bg-card: #ffffff;
+  --bg-subcard: #f8fafc;
+  --bg-input: #f1f5f9;
+  --border-color: #e2e8f0;
+  --text-main: #1e293b;
+  --text-sub: #334155;
+  --text-muted: #64748b;
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
+  --accent-green: #03c75a;
+  --accent-blue: #0068c3;
+  --accent-yellow: #d97706;
+  --rail-active-bg: rgba(3, 199, 90, 0.12);
+  --rail-active-color: #03c75a;
+  --panel-shadow: 4px 0 20px rgba(15, 23, 42, 0.14);
 }
 
 * {
@@ -32,86 +61,93 @@
 }
 
 body {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-  background-color: var(--bg-dark);
+  font-family: 'Pretendard', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-dark);
   color: var(--text-main);
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .top-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px;
-  background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+  padding: 8px 16px;
+  background: var(--bg-panel);
   border-bottom: 1px solid var(--border-color);
-  gap: 16px;
-  flex-shrink: 0;
-  z-index: 1200;
+  gap: 14px;
+  flex-wrap: wrap;
+  z-index: 1100;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .brand-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand-badge {
-  background: var(--accent-red);
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
   color: #fff;
   font-weight: 800;
-  font-size: 1.1rem;
-  padding: 6px 10px;
+  font-size: 1.05rem;
+  padding: 5px 10px;
   border-radius: 8px;
   letter-spacing: 0.5px;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+body.theme-naver .brand-badge {
+  background: linear-gradient(135deg, #03c75a, #029f48);
+  box-shadow: 0 2px 8px rgba(3, 199, 90, 0.3);
 }
 
 .brand-title {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .brand-subtitle {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
-  margin-top: 2px;
 }
 
 .control-bar {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .control-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   position: relative;
 }
 
 .control-item label {
-  font-size: 0.72rem;
+  font-size: 0.71rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
 .control-item select,
 .control-item input {
-  background: #0f172a;
+  background: var(--bg-input);
   color: var(--text-main);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 0.84rem;
-  min-width: 170px;
+  font-size: 0.83rem;
+  min-width: 165px;
   outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .control-item select:focus,
@@ -127,45 +163,65 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
+  min-width: 260px;
   right: 0;
   margin-top: 4px;
-  background: #0f172a;
+  background: var(--bg-card);
   border: 1px solid var(--accent-blue);
-  border-radius: 6px;
-  max-height: 280px;
+  border-radius: 8px;
+  max-height: 340px;
   overflow-y: auto;
   z-index: 2000;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.search-header-bar {
+  position: sticky;
+  top: 0;
+  background: var(--bg-subcard);
+  color: var(--accent-blue);
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(6px);
 }
 
 .search-item {
   padding: 8px 10px;
   font-size: 0.83rem;
+  color: var(--text-main);
   cursor: pointer;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.search-item:hover {
-  background: #1e293b;
+.search-item:hover,
+.search-item.active {
+  background: var(--rail-active-bg);
 }
 
 .search-item-eup {
   font-size: 0.72rem;
   color: var(--accent-blue);
+  font-weight: 600;
 }
 
 .control-actions {
   display: flex;
-  gap: 8px;
+  gap: 7px;
+  flex-wrap: wrap;
 }
 
 .btn {
-  padding: 7px 12px;
+  padding: 7px 11px;
   border-radius: 6px;
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   font-weight: 600;
   border: 1px solid transparent;
   cursor: pointer;
@@ -181,10 +237,34 @@ body {
   background: #dc2626;
 }
 
+body.theme-naver .btn-primary {
+  background: #03c75a;
+  color: #fff;
+}
+
+body.theme-naver .btn-primary:hover {
+  background: #02b350;
+}
+
+.btn-guide {
+  background: var(--rail-active-bg);
+  color: var(--rail-active-color);
+  border-color: var(--rail-active-color);
+}
+
+.btn-guide:hover {
+  background: var(--rail-active-color);
+  color: #fff;
+}
+
 .btn-secondary {
-  background: #1e293b;
+  background: var(--bg-card);
   color: var(--text-main);
   border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-blue);
 }
 
 .btn-secondary.active {
@@ -197,35 +277,323 @@ body {
   font-size: 0.74rem;
 }
 
-.workspace {
+/* ============================================================================
+ * 네이버 지도(map.naver.com) 스타일 전면 지도 + 좌측 통합 도크 레이아웃
+ * ============================================================================ */
+.workspace.naver-workspace {
   flex: 1;
-  display: grid;
-  grid-template-columns: 320px 1fr 360px;
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  display: block;
 }
 
-.side-panel {
+.map-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #0b1120;
+}
+
+/* Leaflet 기본 좌상단 줌 컨트롤을 우측으로 배치하여 좌측 네이버 도크와 겹침 방지 */
+.leaflet-top.leaflet-left {
+  left: auto !important;
+  right: 14px !important;
+  top: 56px !important;
+}
+
+.naver-dock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 950;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+.naver-rail {
+  width: 64px;
+  min-width: 64px;
+  background: var(--bg-rail);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 4px;
+  z-index: 965;
+  pointer-events: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.18);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.rail-top-group,
+.rail-bottom-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rail-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 2px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+
+.rail-tab:hover {
+  background: var(--bg-subcard);
+  color: var(--text-main);
+}
+
+.rail-tab.active {
+  background: var(--rail-active-bg);
+  color: var(--rail-active-color);
+  border-color: rgba(56, 189, 248, 0.35);
+  font-weight: 700;
+}
+
+body.theme-naver .rail-tab.active {
+  border-color: rgba(3, 199, 90, 0.35);
+}
+
+.rail-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.rail-label {
+  font-size: 0.67rem;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+/* 좌측 단일 접이식 통합 드로어 */
+.naver-drawer {
+  width: 390px;
+  min-width: 390px;
+  max-width: calc(100vw - 90px);
+  height: 100%;
   background: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--panel-shadow);
   padding: 12px;
   overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  transition:
+    width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.26s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+.naver-drawer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.naver-drawer::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 999px;
+}
+
+.side-panel.collapsed,
+.naver-drawer.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-right: none !important;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.drawer-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--bg-subcard);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.drawer-tab-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.drawer-tab-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--rail-active-bg);
+  color: var(--rail-active-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.drawer-tab-title {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.drawer-tab-desc {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-section-group {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.left-panel {
-  border-right: 1px solid var(--border-color);
+.drawer-section-group.collapsed,
+.drawer-section-group.tab-hidden,
+.tab-hidden {
+  display: none !important;
 }
 
-.right-panel {
-  border-left: 1px solid var(--border-color);
+/* 네이버 지도 스타일 드로어 우측 중앙 접기/펼치기 핸들 */
+.naver-drawer-handle {
+  align-self: center;
+  pointer-events: auto;
+  width: 24px;
+  height: 60px;
+  background: var(--bg-panel);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 2px 12px rgba(0, 0, 0, 0.28);
+  transition: background 0.16s ease, color 0.16s ease;
+  user-select: none;
 }
 
+.naver-drawer-handle:hover {
+  background: var(--rail-active-color);
+  color: #fff;
+}
+
+/* 우측 플로팅 지도 컨트롤 독 */
+.floating-right-dock {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dock-btn {
+  background: var(--bg-panel);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.15s ease;
+}
+
+.dock-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* 네이버 길찾기 스타일 차량 제원 빠른 탭 바 */
+.naver-vehicle-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-bottom: 10px;
+  background: var(--bg-subcard);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.veh-tab {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.veh-tab:hover {
+  color: var(--text-main);
+}
+
+.veh-tab.active {
+  background: var(--bg-card);
+  color: var(--rail-active-color);
+  border-color: var(--rail-active-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 카드 및 내부 컴포넌트 스타일 */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .card-header {
@@ -238,6 +606,7 @@ body {
 .card-header h2 {
   font-size: 0.92rem;
   font-weight: 700;
+  color: var(--text-main);
 }
 
 .badge {
@@ -245,43 +614,53 @@ body {
   padding: 2px 8px;
   border-radius: 999px;
   font-weight: 600;
-  background: #334155;
-  color: #e2e8f0;
+  background: var(--bg-subcard);
+  color: var(--text-sub);
+  border: 1px solid var(--border-color);
 }
 
 .badge-info {
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(56, 189, 248, 0.18);
   color: var(--accent-blue);
   border: 1px solid rgba(56, 189, 248, 0.4);
 }
 
 .badge-pass {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--accent-green);
-  border: 1px solid rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.18);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+body:not(.theme-naver) .badge-pass {
+  color: #4ade80;
 }
 
 .badge-warn {
-  background: rgba(249, 115, 22, 0.22);
-  color: var(--accent-orange);
-  border: 1px solid rgba(249, 115, 22, 0.5);
+  background: rgba(249, 115, 22, 0.2);
+  color: #ea580c;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+}
+
+body:not(.theme-naver) .badge-warn {
+  color: #fb923c;
 }
 
 .muted-text {
   font-size: 0.78rem;
   color: var(--text-muted);
   line-height: 1.45;
+  margin-bottom: 10px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .stat-box {
-  background: rgba(15, 23, 42, 0.65);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 10px;
@@ -290,50 +669,51 @@ body {
   gap: 2px;
 }
 
+.stat-pass {
+  border-left: 3px solid var(--accent-green);
+}
+
+.stat-block {
+  border-left: 3px solid var(--accent-red);
+}
+
+.stat-turn {
+  border-left: 3px solid var(--accent-orange);
+}
+
 .stat-label {
   font-size: 0.72rem;
   color: var(--text-muted);
 }
 
 .stat-value {
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 700;
-}
-
-.stat-pass .stat-value {
-  color: var(--accent-green);
-}
-
-.stat-block .stat-value {
-  color: var(--accent-red);
-}
-
-.stat-turn .stat-value {
-  color: var(--accent-orange);
+  color: var(--text-main);
 }
 
 .spec-bar {
-  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--text-sub);
+  background: var(--bg-subcard);
   padding: 7px 9px;
   border-radius: 6px;
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  font-size: 0.73rem;
-  color: #bae6fd;
+  border: 1px solid var(--border-color);
   line-height: 1.4;
 }
 
 .layer-list {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 .layer-check {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.81rem;
+  color: var(--text-main);
   cursor: pointer;
 }
 
@@ -344,7 +724,7 @@ body {
 }
 
 .diag-title {
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   color: var(--accent-blue);
   font-weight: 600;
 }
@@ -358,32 +738,22 @@ body {
 }
 
 .village-chip {
-  background: #0f172a;
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
-  color: var(--text-main);
+  color: var(--text-sub);
   padding: 4px 9px;
   border-radius: 999px;
   font-size: 0.76rem;
   cursor: pointer;
+  transition: all 0.14s ease;
 }
 
 .village-chip:hover,
 .village-chip.active {
-  border-color: var(--accent-blue);
-  background: rgba(56, 189, 248, 0.16);
-  color: #fff;
-}
-
-.map-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-#map {
-  width: 100%;
-  height: 100%;
-  background: #0b1120;
+  border-color: var(--rail-active-color);
+  background: var(--rail-active-bg);
+  color: var(--rail-active-color);
+  font-weight: 700;
 }
 
 .map-loading {
@@ -391,34 +761,32 @@ body {
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--bg-panel);
   border: 1px solid var(--accent-blue);
-  color: #fff;
+  color: var(--text-main);
   padding: 8px 16px;
   border-radius: 999px;
   font-size: 0.84rem;
   z-index: 1000;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .map-legend {
-  position: absolute;
-  bottom: 18px;
-  left: 14px;
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 10px 12px;
-  z-index: 900;
-  font-size: 0.76rem;
+  padding: 9px 11px;
+  font-size: 0.77rem;
+  color: var(--text-main);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .legend-title {
   font-weight: 700;
   margin-bottom: 2px;
-  color: #e2e8f0;
+  color: var(--text-main);
 }
 
 .legend-row {
@@ -481,7 +849,7 @@ body {
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(16, 185, 129, 0.94);
+  background: rgba(16, 185, 129, 0.95);
   border: 1px solid #fff;
   color: #06281e;
   font-weight: 700;
@@ -497,14 +865,14 @@ body.pick-start-mode #map {
 }
 
 .start-control-bar {
-  background: rgba(15, 23, 42, 0.65);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 8px 10px;
+  padding: 9px 10px;
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .start-status-row {
@@ -517,6 +885,7 @@ body.pick-start-mode #map {
 
 .start-label {
   color: var(--text-muted);
+  font-weight: 600;
 }
 
 .start-value {
@@ -538,7 +907,7 @@ body.pick-start-mode #map {
   display: inline-block;
   margin-top: 6px;
   font-size: 0.74rem;
-  color: #93c5fd;
+  color: var(--accent-blue);
 }
 
 .empty-state {
@@ -547,19 +916,25 @@ body.pick-start-mode #map {
   font-size: 0.8rem;
   color: var(--text-muted);
   line-height: 1.5;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--bg-subcard);
+  border: 1px dashed var(--border-color);
   border-radius: 8px;
 }
 
 .alert-box {
   padding: 9px 10px;
   border-radius: 8px;
-  background: rgba(239, 68, 68, 0.16);
+  background: rgba(239, 68, 68, 0.14);
   border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #fecaca;
+  color: #ef4444;
   font-size: 0.79rem;
+  font-weight: 600;
   margin-bottom: 10px;
   line-height: 1.4;
+}
+
+body:not(.theme-naver) .alert-box {
+  color: #fecaca;
 }
 
 .tactical-metrics {
@@ -569,7 +944,7 @@ body.pick-start-mode #map {
 }
 
 .metric-item {
-  background: rgba(15, 23, 42, 0.7);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 10px;
@@ -579,7 +954,7 @@ body.pick-start-mode #map {
 }
 
 .metric-item.highlight-hose {
-  border-color: rgba(249, 115, 22, 0.5);
+  border-color: rgba(249, 115, 22, 0.55);
 }
 
 .metric-label {
@@ -589,27 +964,32 @@ body.pick-start-mode #map {
 
 .metric-val {
   font-size: 0.98rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .info-strip {
   margin-top: 8px;
   padding: 8px 10px;
   border-radius: 6px;
-  background: rgba(15, 23, 42, 0.75);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   font-size: 0.79rem;
+  color: var(--text-main);
 }
 
 .nav-integration-box {
   margin-top: 10px;
   padding: 10px;
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.82);
-  border: 1px solid rgba(56, 189, 248, 0.38);
+  background: var(--bg-subcard);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+body.theme-naver .nav-integration-box {
+  border-color: rgba(3, 199, 90, 0.4);
 }
 
 .nav-header-row {
@@ -622,7 +1002,7 @@ body.pick-start-mode #map {
 .nav-title {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-main);
 }
 
 .nav-engine-group {
@@ -633,7 +1013,7 @@ body.pick-start-mode #map {
 
 .nav-via-summary {
   font-size: 0.75rem;
-  color: #93c5fd;
+  color: var(--accent-blue);
   line-height: 1.4;
 }
 
@@ -667,7 +1047,7 @@ body.pick-start-mode #map {
 }
 
 .btn-nav-naver {
-  background: #16a34a;
+  background: #03c75a;
   color: #fff;
   border-color: #4ade80;
 }
@@ -682,26 +1062,27 @@ body.pick-start-mode #map {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.79rem;
+  color: var(--text-main);
 }
 
 .info-table th,
 .info-table td {
   padding: 6px 4px;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  border-bottom: 1px solid var(--border-color);
   text-align: left;
 }
 
 .info-table th {
   color: var(--text-muted);
   width: 34%;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .ai-brief-box {
   font-size: 0.8rem;
   line-height: 1.55;
-  color: #e2e8f0;
-  background: rgba(15, 23, 42, 0.65);
+  color: var(--text-main);
+  background: var(--bg-subcard);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 10px;
@@ -712,6 +1093,408 @@ body.pick-start-mode #map {
   display: none !important;
 }
 
+/* ============================================================================
+   네이버 지도 스타일 정보 팝업 (도로 링크 / 건물 / 정점 / 소화전 / 길안내 링크 클릭 시)
+   ============================================================================ */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.24) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: 300px !important;
+  line-height: 1.45;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Malgun Gothic', sans-serif;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  top: 10px !important;
+  right: 10px !important;
+  width: 24px !important;
+  height: 24px !important;
+  line-height: 22px !important;
+  border-radius: 50%;
+  color: var(--text-muted) !important;
+  font-size: 16px !important;
+  background: var(--bg-subcard);
+  text-align: center;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: var(--text-main) !important;
+  background: var(--border-color);
+}
+
+/* 네이버 지도형 툴팁 (마우스 호버 시) */
+.leaflet-tooltip {
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px !important;
+  padding: 8px 11px !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.2) !important;
+  font-size: 0.76rem !important;
+  line-height: 1.45 !important;
+}
+
+.naver-popup {
+  padding: 14px 15px 13px;
+}
+
+.naver-popup-header {
+  padding-right: 22px;
+  margin-bottom: 10px;
+}
+
+.naver-popup-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.naver-popup-cat {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-subcard);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.naver-popup-badge {
+  font-size: 0.69rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.naver-popup-badge.pass {
+  background: rgba(3, 199, 90, 0.14);
+  color: #029e47;
+  border: 1px solid rgba(3, 199, 90, 0.45);
+}
+
+body:not(.theme-naver) .naver-popup-badge.pass {
+  color: #4ade80;
+}
+
+.naver-popup-badge.turn {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ea580c;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+}
+
+body:not(.theme-naver) .naver-popup-badge.turn {
+  color: #fb923c;
+}
+
+.naver-popup-badge.block {
+  background: rgba(239, 68, 68, 0.14);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+
+body:not(.theme-naver) .naver-popup-badge.block {
+  color: #f87171;
+}
+
+.naver-popup-badge.info {
+  background: rgba(2, 132, 199, 0.14);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.4);
+}
+
+body:not(.theme-naver) .naver-popup-badge.info {
+  color: #38bdf8;
+}
+
+.naver-popup-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+
+.naver-popup-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.naver-popup-grid {
+  background: var(--bg-subcard);
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.naver-popup-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.naver-popup-cell.full {
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 5px;
+  margin-top: 2px;
+}
+
+.naver-popup-label {
+  font-size: 0.67rem;
+  color: var(--text-muted);
+}
+
+.naver-popup-val {
+  font-size: 0.79rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.naver-popup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.naver-popup-btn {
+  border-radius: 8px;
+  padding: 7px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-subcard);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.naver-popup-btn:hover {
+  border-color: var(--rail-active-color);
+  color: var(--rail-active-color);
+}
+
+.naver-popup-btn.btn-start {
+  background: rgba(3, 199, 90, 0.12);
+  color: #029e47;
+  border-color: rgba(3, 199, 90, 0.45);
+}
+
+body:not(.theme-naver) .naver-popup-btn.btn-start {
+  color: #34d399;
+}
+
+.naver-popup-btn.btn-start:hover {
+  background: #03c75a;
+  color: #fff;
+}
+
+.naver-popup-btn.btn-target {
+  background: rgba(255, 59, 48, 0.12);
+  color: #dc2626;
+  border-color: rgba(255, 59, 48, 0.45);
+}
+
+body:not(.theme-naver) .naver-popup-btn.btn-target {
+  color: #f87171;
+}
+
+.naver-popup-btn.btn-target:hover {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.naver-popup-btn.full {
+  grid-column: 1 / -1;
+}
+
+/* 사용방법 단계별 스포트라이트 가이드 오버레이 */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.tutorial-spotlight {
+  position: fixed;
+  border-radius: 10px;
+  border: 2.5px solid #38bdf8;
+  box-shadow:
+    0 0 0 9999px rgba(2, 6, 23, 0.84),
+    0 0 28px 6px rgba(56, 189, 248, 0.85),
+    inset 0 0 14px rgba(56, 189, 248, 0.35);
+  pointer-events: none;
+  z-index: 5001;
+  transition:
+    top 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: tutorialPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes tutorialPulse {
+  0%,
+  100% {
+    border-color: #38bdf8;
+  }
+  50% {
+    border-color: #fef08a;
+  }
+}
+
+.tutorial-target-active {
+  position: relative;
+  filter: brightness(1.18) contrast(1.05);
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.9) !important;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-container.tutorial-target-active {
+  filter: none;
+}
+
+.tutorial-card {
+  position: fixed;
+  z-index: 5010;
+  width: min(400px, 92vw);
+  background: #0f172a;
+  border: 1.5px solid #38bdf8;
+  border-radius: 12px;
+  padding: 16px 18px;
+  color: #f8fafc;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  transition:
+    top 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tutorial-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.tutorial-step-badge {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.tutorial-step-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutorial-dot.active {
+  width: 20px;
+  border-radius: 999px;
+  background: #38bdf8;
+}
+
+.tutorial-close-x {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.tutorial-close-x:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-step-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fef08a;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.tutorial-step-desc {
+  font-size: 0.83rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  margin-bottom: 14px;
+}
+
+.tutorial-step-desc strong {
+  color: #38bdf8;
+}
+
+.tutorial-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid rgba(51, 65, 85, 0.7);
+  padding-top: 10px;
+}
+
+.tutorial-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 840px) {
+  .naver-drawer {
+    width: 320px;
+    min-width: 320px;
+  }
+}
+
 @media print {
   body {
     background: #fff;
@@ -720,25 +1503,37 @@ body.pick-start-mode #map {
     overflow: visible;
   }
   .top-header .control-bar,
-  .left-panel {
+  .naver-rail,
+  .naver-drawer-handle,
+  .floating-right-dock,
+  .tutorial-overlay {
     display: none !important;
   }
-  .workspace {
+  .workspace.naver-workspace {
     display: block;
+    position: static;
   }
   .map-container {
+    position: relative;
     height: 420px;
     margin-bottom: 16px;
   }
-  .right-panel {
+  .naver-dock {
+    position: static;
+    display: block;
+  }
+  .naver-drawer {
     width: 100%;
+    max-width: 100%;
     border: none;
+    box-shadow: none;
   }
 }
 
 </style>
 </head>
-<body>
+<body class="theme-naver">
+  <!-- 상단 플로팅 통합 검색·제어 바 -->
   <header class="top-header">
     <div class="brand-group">
       <div class="brand-badge">119</div>
@@ -754,25 +1549,25 @@ body.pick-start-mode #map {
         <select id="region-select" aria-label="읍·면 또는 지역 선택"></select>
       </div>
 
-      <div class="control-item">
-        <label for="village-select">마을 선택 (239개)</label>
+      <div id="control-item-village-select" class="control-item">
+        <label for="village-select">전체 마을 선택 (239개)</label>
         <select id="village-select" aria-label="마을 선택">
           <option value="">전체 읍·면 보기</option>
         </select>
       </div>
 
-      <div class="control-item search-wrap">
-        <label for="village-search">마을 빠른 검색</label>
+      <div id="control-item-village-search" class="control-item search-wrap">
+        <label for="village-search">마을 통합 검색 (239개)</label>
         <input
           id="village-search"
           type="text"
-          placeholder="마을명 입력 (예: 구상곡, 대천, 가미)"
+          placeholder="클릭 또는 마을·읍면 입력 (239개 전체)"
           autocomplete="off"
         />
         <div id="village-search-results" class="search-dropdown hidden"></div>
       </div>
 
-      <div class="control-item">
+      <div id="control-item-vehicle" class="control-item">
         <label for="vehicle-select">출동 소방차량 제원</label>
         <select id="vehicle-select" aria-label="출동 소방차량 제원 선택">
           <option value="2.0">경형펌프/구급차 (기준폭 2.0m · 회전R 5.8m)</option>
@@ -786,6 +1581,12 @@ body.pick-start-mode #map {
         <button id="btn-route-search" class="btn btn-primary" type="button" title="클릭 후 지도에서 1) 출발지 → 2) 화점 순서로 선택하여 경로를 탐색합니다">
           경로탐색
         </button>
+        <button id="btn-how-to-use" class="btn btn-guide" type="button" title="경로 탐색 시 클릭해야 하는 버튼 순서와 사용 방법을 화면 하이라이트로 안내합니다">
+          ❓ 사용방법 보기
+        </button>
+        <button id="btn-toggle-theme" class="btn btn-secondary active" type="button" title="네이버 지도 스타일 라이트 테마와 전술 다크 테마를 전환합니다">
+          🌙 다크 테마
+        </button>
         <button id="btn-toggle-hybrid" class="btn btn-secondary active" type="button" title="지명/도로명 하이브리드 라벨 표시">
           지명라벨 ON
         </button>
@@ -796,233 +1597,342 @@ body.pick-start-mode #map {
     </div>
   </header>
 
-  <main class="workspace">
-    <!-- 좌측: 지역/마을 도로망 현황 및 레이어 제어 -->
-    <aside id="left-panel" class="side-panel left-panel">
-      <section class="card">
-        <div class="card-header">
-          <h2 id="scope-title">지역 도로망 판정 현황</h2>
-          <span id="scope-badge" class="badge badge-info">방식 B</span>
+  <main class="workspace naver-workspace">
+    <!-- 좌측 네이버 지도형 도크: 수직 아이콘 탭 레일(64px) + 단일 접이식 통합 드로어(390px) -->
+    <div id="naver-dock" class="naver-dock">
+      <nav id="naver-rail" class="naver-rail" aria-label="주 기능 탭 메뉴">
+        <div class="rail-top-group">
+          <button type="button" class="rail-tab active" data-drawer-tab="all" title="전체 전술 정보 통합 보기">
+            <span class="rail-icon">📋</span>
+            <span class="rail-label">전체보기</span>
+          </button>
+          <button type="button" class="rail-tab" data-drawer-tab="route" title="길찾기(경로탐색) 및 내비게이션 연동">
+            <span class="rail-icon">🚒</span>
+            <span class="rail-label">길찾기</span>
+          </button>
+          <button type="button" class="rail-tab" data-drawer-tab="brief" title="화점 건축물대장 표제부 및 AI 지휘 브리핑">
+            <span class="rail-icon">🏢</span>
+            <span class="rail-label">화점·AI</span>
+          </button>
+          <button type="button" class="rail-tab" data-drawer-tab="status" title="지역 도로망 판정 통계 및 마을 목록">
+            <span class="rail-icon">📊</span>
+            <span class="rail-label">마을현황</span>
+          </button>
+          <button type="button" class="rail-tab" data-drawer-tab="layer" title="공간 진단 레이어 및 범례">
+            <span class="rail-icon">🗂</span>
+            <span class="rail-label">레이어·범례</span>
+          </button>
         </div>
-        <p id="scope-desc" class="muted-text">[경로탐색] 버튼을 클릭한 후 지도에서 출발지 → 화점을 순서대로 선택하면 2단계(차량+호스) 진입 경로를 산출합니다.</p>
 
-        <div class="stats-grid">
-          <div class="stat-box">
-            <span class="stat-label">분석 도로 연장</span>
-            <strong id="stat-total-len" class="stat-value">-</strong>
+        <div class="rail-bottom-group">
+          <button type="button" id="btn-rail-theme" class="rail-tab active" title="네이버 스타일 라이트 테마 ⇄ 전술 다크 테마 전환">
+            <span class="rail-icon" id="rail-theme-icon">🌙</span>
+            <span class="rail-label" id="rail-theme-label">다크테마</span>
+          </button>
+          <button type="button" id="btn-rail-how-to-use" class="rail-tab" title="3단계 경로탐색 사용방법 안내">
+            <span class="rail-icon">❓</span>
+            <span class="rail-label">사용법</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- 좌측 단일 통합 드로어 패널 -->
+      <aside id="left-panel" class="side-panel left-panel naver-drawer">
+        <!-- 네이버 스타일 드로어 현재 활성 탭 타이틀 바 -->
+        <div id="drawer-tab-header" class="drawer-tab-header">
+          <div class="drawer-tab-title-wrap">
+            <span id="drawer-tab-icon" class="drawer-tab-icon">📋</span>
+            <div>
+              <strong id="drawer-tab-title" class="drawer-tab-title">전체 통합 전술 메뉴</strong>
+              <span id="drawer-tab-desc" class="drawer-tab-desc">길찾기 · 화점/AI · 마을현황 · 레이어 전체 표시</span>
+            </div>
           </div>
-          <div class="stat-box stat-pass">
-            <span class="stat-label">차량 진입 가능</span>
-            <strong id="stat-passable" class="stat-value">-</strong>
+          <button id="btn-drawer-show-all" type="button" class="btn btn-xs btn-secondary hidden">전체보기</button>
+        </div>
+
+        <!-- [섹션 그룹 1: 길찾기 · 출동 전술 브리핑 / 건축물대장 / AI 브리핑] -->
+        <div id="right-panel" class="drawer-section-group">
+          <section class="card mission-card" data-tab-section="route">
+            <div class="card-header">
+              <h2>출동 길찾기 · 전술 판정 브리핑</h2>
+              <span id="mission-status-badge" class="badge badge-neutral">경로탐색 대기</span>
+            </div>
+
+            <!-- 네이버 길찾기 스타일 차량 제원 탭 바 -->
+            <div class="naver-vehicle-tabs" role="tablist" aria-label="출동 소방차량 빠른 선택">
+              <button type="button" class="veh-tab" data-veh-width="2.0">🚑 경형 2.0m</button>
+              <button type="button" class="veh-tab active" data-veh-width="2.2">🚒 소형 2.2m</button>
+              <button type="button" class="veh-tab" data-veh-width="2.5">🚛 중형 2.5m</button>
+              <button type="button" class="veh-tab" data-veh-width="2.8">🚒 대형 2.8m</button>
+            </div>
+
+            <!-- 네이버 길찾기 스타일 출발→화점 입력 컨트롤 박스 -->
+            <div class="start-control-bar naver-route-box">
+              <div class="start-status-row">
+                <span class="start-label">🟢 출발지:</span>
+                <strong id="start-point-status" class="start-value">미지정 ([경로탐색] 클릭 후 출발→화점 선택)</strong>
+              </div>
+              <div class="start-btn-row">
+                <button
+                  id="btn-pick-start"
+                  class="btn btn-xs btn-primary"
+                  type="button"
+                  title="클릭 후 지도에서 1) 출발지 지점 → 2) 화점(목표 건물·지점)을 순서대로 클릭해 경로를 탐색합니다"
+                >
+                  경로탐색 (출발→화점 선택)
+                </button>
+                <button
+                  id="btn-station-start"
+                  class="btn btn-xs btn-secondary"
+                  type="button"
+                  title="의령소방서(의병로 108-17)를 출발점으로 설정하고 지도에서 화점을 선택합니다"
+                >
+                  🚒 의령소방서 출발
+                </button>
+                <button
+                  id="btn-reset-start"
+                  class="btn btn-xs btn-secondary hidden"
+                  type="button"
+                  title="선택한 출발지·화점 및 탐색 경로를 초기화합니다"
+                >
+                  경로 초기화
+                </button>
+              </div>
+            </div>
+
+            <div id="mission-empty" class="empty-state">
+              <strong>[경로탐색]</strong> 버튼을 클릭한 후 지도 위에서<br />
+              <strong>① 출발지</strong>와 <strong>② 화점(건물·목표지점)</strong>을 순서대로 클릭하세요.<br />
+              <span class="sub-hint">※ 선택한 실제 출발 좌표(교차점 강제 이동 없음)를 기준으로 1차 소방차 진입 한계점과 2차 호스 연장 경로를 산출합니다.</span>
+            </div>
+
+            <div id="mission-result" class="mission-result hidden">
+              <div id="bottleneck-alert" class="alert-box hidden"></div>
+
+              <div class="tactical-metrics">
+                <div class="metric-item">
+                  <span class="metric-label">1차 소방차 진입 거리</span>
+                  <strong id="metric-veh-dist" class="metric-val">-</strong>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">출발 → 하차 거점</span>
+                  <strong id="metric-staging-node" class="metric-val">-</strong>
+                </div>
+                <div class="metric-item highlight-hose">
+                  <span class="metric-label">2차 소방호스 연장 거리</span>
+                  <strong id="metric-hose-dist" class="metric-val">-</strong>
+                </div>
+                <div class="metric-item highlight-hose">
+                  <span class="metric-label">15m 소방호스 소요량</span>
+                  <strong id="metric-hose-count" class="metric-val">-</strong>
+                </div>
+              </div>
+
+              <div id="time-box" class="info-strip">
+                <strong>예상 소요시간:</strong> <span id="metric-total-time">-</span>
+              </div>
+
+              <div id="hydrant-box" class="info-strip">
+                <strong>최단 소화용수:</strong> <span id="metric-hydrant">-</span>
+              </div>
+
+              <div id="nav-integration-box" class="nav-integration-box">
+                <div class="nav-header-row">
+                  <span class="nav-title">실시간 길안내 · T맵 API 선택 연동</span>
+                  <div class="nav-engine-group">
+                    <span id="route-engine-badge" class="badge badge-neutral">자체 그래프 탐색</span>
+                    <button
+                      id="btn-tmap-recalc"
+                      class="btn btn-xs btn-secondary"
+                      type="button"
+                      title="사용자가 클릭할 때만 안전 우회 경유점(passList)을 포함하여 T맵 API(또는 OSRM) 경로를 호출합니다"
+                    >
+                      🗺 T맵 API 경로 연동
+                    </button>
+                  </div>
+                </div>
+                <div id="nav-via-summary" class="nav-via-summary">
+                  안전 우회 경유점 없음 (최단 경로 진입 가능)
+                </div>
+                <div id="nav-deeplink-bar" class="nav-deeplink-bar">
+                  <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#" target="_blank" rel="noopener">T맵 길안내</a>
+                  <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#" target="_blank" rel="noopener">네이버 길안내</a>
+                  <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#" target="_blank" rel="noopener">카카오 길안내</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card" data-tab-section="brief">
+            <div class="card-header">
+              <h2>화점 건축물대장 · 주소 정보</h2>
+              <span id="bldg-api-badge" class="badge badge-neutral">실시간 연동</span>
+            </div>
+            <div id="building-info-box" class="info-table-wrap">
+              <p class="muted-text">건물 클릭 시 VWorld 역지오코딩 및 건축물대장 정보를 실시간 조회합니다.</p>
+            </div>
+          </section>
+
+          <section class="card" data-tab-section="brief">
+            <div class="card-header">
+              <h2>AI 현장 지휘 브리핑</h2>
+              <button id="btn-ai-brief" class="btn btn-xs btn-secondary" type="button">AI 전술 생성</button>
+            </div>
+            <div id="ai-brief-box" class="ai-brief-box">
+              화점을 선택하면 차량 제원·회전반경·호스 본수·수원 위치를 종합한 현장 지휘 브리핑이 생성됩니다.
+            </div>
+          </section>
+        </div>
+
+        <!-- [섹션 그룹 2: 지역 도로망 현황 / 마을 목록 / 레이어 및 범례] -->
+        <section class="card" data-tab-section="status">
+          <div class="card-header">
+            <h2 id="scope-title">지역 도로망 판정 현황</h2>
+            <span id="scope-badge" class="badge badge-info">방식 B</span>
           </div>
-          <div class="stat-box stat-block">
-            <span class="stat-label">폭원/연결 차단</span>
-            <strong id="stat-blocked" class="stat-value">-</strong>
+          <p id="scope-desc" class="muted-text">[경로탐색] 버튼을 클릭한 후 지도에서 출발지 → 화점을 순서대로 선택하면 2단계(차량+호스) 진입 경로를 산출합니다.</p>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">분석 도로 연장</span>
+              <strong id="stat-total-len" class="stat-value">-</strong>
+            </div>
+            <div class="stat-box stat-pass">
+              <span class="stat-label">차량 진입 가능</span>
+              <strong id="stat-passable" class="stat-value">-</strong>
+            </div>
+            <div class="stat-box stat-block">
+              <span class="stat-label">폭원/연결 차단</span>
+              <strong id="stat-blocked" class="stat-value">-</strong>
+            </div>
+            <div class="stat-box stat-turn">
+              <span class="stat-label">회전반경 차단</span>
+              <strong id="stat-turn-blocked" class="stat-value">-</strong>
+            </div>
           </div>
-          <div class="stat-box stat-turn">
-            <span class="stat-label">회전반경 차단</span>
-            <strong id="stat-turn-blocked" class="stat-value">-</strong>
+
+          <div id="vehicle-spec-bar" class="spec-bar">
+            차폭 2.19m · 전장 6.78m · 축거 3.75m · 최소회전반경 6.80m · 90° 회전 가산폭 +0.92m
           </div>
-        </div>
+        </section>
 
-        <div id="vehicle-spec-bar" class="spec-bar">
-          차폭 2.19m · 전장 6.78m · 축거 3.75m · 최소회전반경 6.80m · 90° 회전 가산폭 +0.92m
-        </div>
-      </section>
+        <section class="card" data-tab-section="status">
+          <div class="card-header">
+            <h2>현재 읍·면 내 마을 목록</h2>
+            <span id="eup-village-count" class="badge">0개</span>
+          </div>
+          <div id="village-chip-list" class="village-chip-list"></div>
+        </section>
 
-      <section class="card">
-        <div class="card-header">
-          <h2>레이어 및 진단 도구</h2>
-        </div>
-        <div class="layer-list">
-          <label class="layer-check">
-            <input type="checkbox" id="chk-layer-roads" checked />
-            <span>방식 B 주행 판정 도로망 (통과/차단/회전불가)</span>
-          </label>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-layer-buildings" checked />
-            <span>VWorld 건물 외곽선 (경로탐색 시 화점 지정)</span>
-          </label>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-layer-hydrants" checked />
-            <span>소화용수 거점 (소화전)</span>
-          </label>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-layer-nodes" />
-            <span>교차로·막다른길·전환 정점 (X/D/T 노드)</span>
-          </label>
-          <hr class="divider" />
-          <div class="diag-title">정밀 공간 진단 레이어 (온디맨드 로드)</div>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-diag-raw" />
-            <span>VWorld 원시 도로중심선 및 폭 출처</span>
-          </label>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-diag-sat" />
-            <span>위성 Mask2Former 실측 구간 하이라이트</span>
-          </label>
-          <label class="layer-check">
-            <input type="checkbox" id="chk-diag-splits" />
-            <span>중심선 분절 병합점 (degree=2 통합 지점)</span>
-          </label>
-        </div>
-      </section>
+        <section class="card" data-tab-section="layer">
+          <div class="card-header">
+            <h2>레이어 및 진단 도구</h2>
+          </div>
+          <div class="layer-list">
+            <label class="layer-check">
+              <input type="checkbox" id="chk-layer-roads" checked />
+              <span>방식 B 주행 판정 도로망 (통과/차단/회전불가)</span>
+            </label>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-layer-buildings" checked />
+              <span>VWorld 건물 외곽선 (경로탐색 시 화점 지정)</span>
+            </label>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-layer-hydrants" checked />
+              <span>소화용수 거점 (소화전)</span>
+            </label>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-layer-nodes" />
+              <span>교차로·막다른길·전환 정점 (X/D/T 노드)</span>
+            </label>
+            <hr class="divider" />
+            <div class="diag-title">정밀 공간 진단 레이어 (온디맨드 로드)</div>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-diag-raw" />
+              <span>VWorld 원시 도로중심선 및 폭 출처</span>
+            </label>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-diag-sat" />
+              <span>위성 Mask2Former 실측 구간 하이라이트</span>
+            </label>
+            <label class="layer-check">
+              <input type="checkbox" id="chk-diag-splits" />
+              <span>중심선 분절 병합점 (degree=2 통합 지점)</span>
+            </label>
+          </div>
+        </section>
 
-      <section class="card">
-        <div class="card-header">
-          <h2>현재 읍·면 내 마을 목록</h2>
-          <span id="eup-village-count" class="badge">0개</span>
-        </div>
-        <div id="village-chip-list" class="village-chip-list"></div>
-      </section>
-    </aside>
+        <section class="card legend-card" data-tab-section="layer">
+          <div class="card-header">
+            <h2>도로 판정 및 전술 경로 범례</h2>
+          </div>
+          <div id="map-legend" class="map-legend">
+            <div class="legend-row"><span class="swatch swatch-pass"></span>차량 진입 가능 구간</div>
+            <div class="legend-row"><span class="swatch swatch-turn"></span>교차로 회전반경 부족 차단</div>
+            <div class="legend-row"><span class="swatch swatch-block"></span>도로 폭원 부족 / 진입 단절</div>
+            <div class="legend-row"><span class="swatch swatch-unk"></span>폭원 미상 구간</div>
+            <div class="legend-row"><span class="swatch swatch-veh-route"></span>1차 소방차량 최적 진입 경로</div>
+            <div class="legend-row"><span class="swatch swatch-trunk-route"></span>T맵·OSRM 연동 도로 경로 (선택 시)</div>
+            <div class="legend-row"><span class="swatch swatch-hose-route"></span>2차 소방호스 연장 경로 (도보 전개)</div>
+            <div class="legend-row"><span class="dot-swatch dot-start"></span>선택 출발 지점 · <span class="dot-swatch dot-via"></span>안전 경유점</div>
+          </div>
+        </section>
+      </aside>
 
-    <!-- 중앙: 지도 캔버스 -->
-    <section class="map-container">
+      <!-- 네이버 지도형 좌측 드로어 접기/펼치기 핸들 버튼 -->
+      <button
+        id="btn-toggle-left-panel"
+        class="naver-drawer-handle"
+        type="button"
+        title="좌측 통합 패널 접기/펼치기"
+      >
+        ◀
+      </button>
+    </div>
+
+    <!-- 전면 지도 캔버스 및 우측 플로팅 도구 독 -->
+    <section id="map-container" class="map-container">
       <div id="map"></div>
+
+      <!-- 우측 플로팅 지도 컨트롤 독 (네이버 지도 우측 도구바 형태) -->
+      <div class="floating-right-dock">
+        <button
+          id="btn-toggle-right-panel"
+          class="dock-btn"
+          type="button"
+          title="출동 브리핑 영역 접기/펼치기"
+        >
+          브리핑 접기
+        </button>
+      </div>
+
       <div id="map-loading" class="map-loading hidden">데이터 불러오는 중...</div>
       <div id="map-pick-banner" class="map-pick-banner hidden">
         1/2단계 [출발지 선택]: 지도 위에서 소방차가 출발할 실제 지점을 클릭하세요 (ESC: 취소)
       </div>
-
-      <div class="map-legend">
-        <div class="legend-title">도로 판정 및 전술 경로 범례</div>
-        <div class="legend-row"><span class="swatch swatch-pass"></span>차량 진입 가능 구간</div>
-        <div class="legend-row"><span class="swatch swatch-turn"></span>교차로 회전반경 부족 차단</div>
-        <div class="legend-row"><span class="swatch swatch-block"></span>도로 폭원 부족 / 진입 단절</div>
-        <div class="legend-row"><span class="swatch swatch-unk"></span>폭원 미상 구간</div>
-        <div class="legend-row"><span class="swatch swatch-veh-route"></span>1차 소방차량 최적 진입 경로</div>
-        <div class="legend-row"><span class="swatch swatch-trunk-route"></span>T맵·OSRM 연동 도로 경로 (선택 시)</div>
-        <div class="legend-row"><span class="swatch swatch-hose-route"></span>2차 소방호스 연장 경로 (도보 전개)</div>
-        <div class="legend-row"><span class="dot-swatch dot-start"></span>선택 출발 지점 · <span class="dot-swatch dot-via"></span>안전 경유점</div>
-      </div>
     </section>
-
-    <!-- 우측: 출동 임무 브리핑 및 건축물/AI 분석 -->
-    <aside id="right-panel" class="side-panel right-panel">
-      <section class="card mission-card">
-        <div class="card-header">
-          <h2>출동 전술 판정 브리핑</h2>
-          <span id="mission-status-badge" class="badge badge-neutral">경로탐색 대기</span>
-        </div>
-
-        <div class="start-control-bar">
-          <div class="start-status-row">
-            <span class="start-label">출발지 상태:</span>
-            <strong id="start-point-status" class="start-value">미지정 ([경로탐색] 클릭 후 출발→화점 선택)</strong>
-          </div>
-          <div class="start-btn-row">
-            <button
-              id="btn-pick-start"
-              class="btn btn-xs btn-primary"
-              type="button"
-              title="클릭 후 지도에서 1) 출발지 지점 → 2) 화점(목표 건물·지점)을 순서대로 클릭해 경로를 탐색합니다"
-            >
-              경로탐색 (출발→화점 선택)
-            </button>
-            <button
-              id="btn-station-start"
-              class="btn btn-xs btn-secondary"
-              type="button"
-              title="의령소방서(의병로 108-17)를 출발점으로 설정하고 지도에서 화점을 선택합니다"
-            >
-              🚒 의령소방서 출발
-            </button>
-            <button
-              id="btn-reset-start"
-              class="btn btn-xs btn-secondary hidden"
-              type="button"
-              title="선택한 출발지·화점 및 탐색 경로를 초기화합니다"
-            >
-              경로 초기화
-            </button>
-          </div>
-        </div>
-
-        <div id="mission-empty" class="empty-state">
-          <strong>[경로탐색]</strong> 버튼을 클릭한 후 지도 위에서<br />
-          <strong>① 출발지</strong>와 <strong>② 화점(건물·목표지점)</strong>을 순서대로 클릭하세요.<br />
-          <span class="sub-hint">※ 선택한 실제 출발 좌표(교차점 강제 이동 없음)를 기준으로 1차 소방차 진입 한계점과 2차 호스 연장 경로를 산출합니다.</span>
-        </div>
-
-        <div id="mission-result" class="mission-result hidden">
-          <div id="bottleneck-alert" class="alert-box hidden"></div>
-
-          <div class="tactical-metrics">
-            <div class="metric-item">
-              <span class="metric-label">1차 소방차 진입 거리</span>
-              <strong id="metric-veh-dist" class="metric-val">-</strong>
-            </div>
-            <div class="metric-item">
-              <span class="metric-label">출발 → 하차 거점</span>
-              <strong id="metric-staging-node" class="metric-val">-</strong>
-            </div>
-            <div class="metric-item highlight-hose">
-              <span class="metric-label">2차 소방호스 연장 거리</span>
-              <strong id="metric-hose-dist" class="metric-val">-</strong>
-            </div>
-            <div class="metric-item highlight-hose">
-              <span class="metric-label">15m 소방호스 소요량</span>
-              <strong id="metric-hose-count" class="metric-val">-</strong>
-            </div>
-          </div>
-
-          <div id="time-box" class="info-strip">
-            <strong>예상 소요시간:</strong> <span id="metric-total-time">-</span>
-          </div>
-
-          <div id="hydrant-box" class="info-strip">
-            <strong>최단 소화용수:</strong> <span id="metric-hydrant">-</span>
-          </div>
-
-          <div id="nav-integration-box" class="nav-integration-box">
-            <div class="nav-header-row">
-              <span class="nav-title">실시간 길안내 · T맵 API 선택 연동</span>
-              <div class="nav-engine-group">
-                <span id="route-engine-badge" class="badge badge-neutral">자체 그래프 탐색</span>
-                <button
-                  id="btn-tmap-recalc"
-                  class="btn btn-xs btn-secondary"
-                  type="button"
-                  title="사용자가 클릭할 때만 안전 우회 경유점(passList)을 포함하여 T맵 API(또는 OSRM) 경로를 호출합니다"
-                >
-                  🗺 T맵 API 경로 연동
-                </button>
-              </div>
-            </div>
-            <div id="nav-via-summary" class="nav-via-summary">
-              안전 우회 경유점 없음 (최단 경로 진입 가능)
-            </div>
-            <div id="nav-deeplink-bar" class="nav-deeplink-bar">
-              <a id="link-nav-tmap" class="btn-nav btn-nav-tmap" href="#" target="_blank" rel="noopener">T맵 길안내</a>
-              <a id="link-nav-naver" class="btn-nav btn-nav-naver" href="#" target="_blank" rel="noopener">네이버 길안내</a>
-              <a id="link-nav-kakao" class="btn-nav btn-nav-kakao" href="#" target="_blank" rel="noopener">카카오 길안내</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-header">
-          <h2>화점 건축물대장 · 주소 정보</h2>
-          <span id="bldg-api-badge" class="badge badge-neutral">실시간 연동</span>
-        </div>
-        <div id="building-info-box" class="info-table-wrap">
-          <p class="muted-text">건물 클릭 시 VWorld 역지오코딩 및 건축물대장 정보를 실시간 조회합니다.</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-header">
-          <h2>AI 현장 지휘 브리핑</h2>
-          <button id="btn-ai-brief" class="btn btn-xs btn-secondary" type="button">AI 전술 생성</button>
-        </div>
-        <div id="ai-brief-box" class="ai-brief-box">
-          화점을 선택하면 차량 제원·회전반경·호스 본수·수원 위치를 종합한 현장 지휘 브리핑이 생성됩니다.
-        </div>
-      </section>
-    </aside>
   </main>
+
+  <!-- 사용방법 단계별 스포트라이트 가이드 오버레이 -->
+  <div id="tutorial-overlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-step-title">
+    <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
+    <div id="tutorial-card" class="tutorial-card">
+      <div class="tutorial-card-header">
+        <span id="tutorial-step-badge" class="tutorial-step-badge">STEP 1 / 3</span>
+        <div id="tutorial-step-dots" class="tutorial-step-dots"></div>
+        <button id="btn-tutorial-close" class="tutorial-close-x" type="button" title="사용방법 닫기 (ESC)">✕</button>
+      </div>
+      <h3 id="tutorial-step-title" class="tutorial-step-title">사용방법 안내</h3>
+      <p id="tutorial-step-desc" class="tutorial-step-desc"></p>
+      <div class="tutorial-card-footer">
+        <button id="btn-tutorial-prev" class="btn btn-xs btn-secondary" type="button">◀ 이전 단계</button>
+        <div class="tutorial-footer-right">
+          <button id="btn-tutorial-skip" class="btn btn-xs btn-secondary" type="button">닫기</button>
+          <button id="btn-tutorial-next" class="btn btn-xs btn-primary" type="button">다음 단계 ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -2579,6 +3489,7 @@ body.pick-start-mode #map {
       setRouteSelectStep('idle');
       return;
     }
+    ensureRouteSectionVisible();
     lastMission = null;
     lastRouteApiResult = null;
     if (missionLayerGroup) missionLayerGroup.clearLayers();
@@ -2597,12 +3508,13 @@ body.pick-start-mode #map {
     }
     if (routeSelectStep === 'pick_target') {
       setRouteSelectStep('idle');
+      ensureRouteSectionVisible();
       dispatchMissionTo(lat, lng, bldgRing, false);
       return;
     }
     // When routeSelectStep === 'idle', require clicking [경로탐색] first
     showNudgeBanner(
-      '안내: 화면 상단 또는 우측 패널의 [경로탐색] 버튼을 클릭한 후 ① 출발지 → ② 화점을 순서대로 선택하세요.'
+      '안내: 화면 상단 또는 좌측 드로어의 [경로탐색] 버튼을 클릭한 후 ① 출발지 → ② 화점을 순서대로 선택하세요.'
     );
   }
 
@@ -2777,69 +3689,156 @@ body.pick-start-mode #map {
     const chipContainer = document.getElementById('village-chip-list');
     const countBadge = document.getElementById('eup-village-count');
 
-    sel.innerHTML = '<option value="">읍·면 전체 도로망 보기</option>';
+    const allVillages = catalog && Array.isArray(catalog.villages) ? catalog.villages : villages;
+    sel.innerHTML = `<option value="">현재 읍·면 전체 도로망 보기 (전체 ${allVillages.length}개 마을 선택 가능)</option>`;
     chipContainer.innerHTML = '';
     countBadge.textContent = `${villages.length}개`;
 
-    villages.forEach((v) => {
-      const opt = document.createElement('option');
-      opt.value = v.id;
-      opt.textContent = `${v.name}마을 (${v.eupName})`;
-      sel.appendChild(opt);
+    // 1) 좌측 패널 칩 리스트 및 드롭다운 상단 그룹: 현재 선택된 읍·면 마을
+    if (villages.length > 0) {
+      const curEupName = villages[0].eupName || '현재 읍·면';
+      const curGroup = document.createElement('optgroup');
+      curGroup.label = `📍 [현재 지역] ${curEupName} (${villages.length}개 마을)`;
+      villages.forEach((v) => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.dataset.regionId = v.regionId || currentRegionCode;
+        opt.textContent = `${v.name}마을 (${v.eupName})`;
+        curGroup.appendChild(opt);
 
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'village-chip';
-      chip.dataset.vid = v.id;
-      chip.textContent = v.name;
-      chip.addEventListener('click', () => {
-        sel.value = v.id;
-        selectVillage(v.id, true);
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'village-chip';
+        chip.dataset.vid = v.id;
+        chip.textContent = v.name;
+        chip.addEventListener('click', () => {
+          sel.value = v.id;
+          selectVillage(v.id, true);
+        });
+        chipContainer.appendChild(chip);
       });
-      chipContainer.appendChild(chip);
-    });
+      sel.appendChild(curGroup);
+    }
+
+    // 2) 드롭다운 전체 13개 읍·면 239개 마을 그룹 추가 (다른 읍·면 마을도 즉시 선택 가능)
+    if (allVillages.length > 0) {
+      const byEup = new Map();
+      allVillages.forEach((v) => {
+        if (v.regionId === currentRegionCode) return;
+        const key = v.eupName || v.regionId;
+        if (!byEup.has(key)) byEup.set(key, []);
+        byEup.get(key).push(v);
+      });
+      byEup.forEach((vList, eupName) => {
+        const grp = document.createElement('optgroup');
+        grp.label = `${eupName} (${vList.length}개 마을)`;
+        vList.forEach((v) => {
+          const opt = document.createElement('option');
+          opt.value = v.id;
+          opt.dataset.regionId = v.regionId;
+          opt.textContent = `${v.name}마을 (${v.eupName})`;
+          grp.appendChild(opt);
+        });
+        sel.appendChild(grp);
+      });
+    }
+  }
+
+  async function jumpToAnyVillage(v) {
+    if (!v) return;
+    const drop = document.getElementById('village-search-results');
+    const input = document.getElementById('village-search');
+    if (drop) drop.classList.add('hidden');
+    if (input) input.value = `${v.eupName} ${v.name}`;
+    if (v.regionId && currentRegionCode !== v.regionId) {
+      document.getElementById('region-select').value = v.regionId;
+      await selectRegion(v.regionId, v.id);
+    } else {
+      document.getElementById('village-select').value = v.id;
+      selectVillage(v.id, true);
+    }
   }
 
   function setupSearchBox() {
     const input = document.getElementById('village-search');
     const drop = document.getElementById('village-search-results');
 
-    input.addEventListener('input', () => {
-      const q = input.value.trim();
-      if (!q || !catalog || !catalog.villages) {
-        drop.classList.add('hidden');
-        drop.innerHTML = '';
-        return;
+    function renderDropdownList(rawQuery) {
+      if (!catalog || !Array.isArray(catalog.villages)) return;
+      const q = (rawQuery || '').trim();
+      const qClean = q.replace(/마을$/g, '').trim();
+      let matches;
+      if (!qClean) {
+        // 검색어가 없을 때는 현재 읍·면 마을을 상단에, 나머지 전체 마을을 이어서 총 239개 전부 표시
+        const curList = catalog.villages.filter((v) => v.regionId === currentRegionCode);
+        const otherList = catalog.villages.filter((v) => v.regionId !== currentRegionCode);
+        matches = [...curList, ...otherList];
+      } else {
+        matches = catalog.villages.filter(
+          (v) =>
+            v.name.includes(qClean) ||
+            v.eupName.includes(qClean) ||
+            `${v.eupName} ${v.name}`.includes(qClean) ||
+            `${v.name}마을`.includes(q)
+        );
       }
-      const matches = catalog.villages
-        .filter((v) => v.name.includes(q) || v.eupName.includes(q) || `${v.eupName} ${v.name}`.includes(q))
-        .slice(0, 20);
+
+      drop.innerHTML = '';
+      const header = document.createElement('div');
+      header.className = 'search-header-bar';
+      header.innerHTML = qClean
+        ? `<span>'${q}' 검색 결과</span><span>${matches.length}개 마을</span>`
+        : `<span>의령군 전체 마을 목록 (클릭 시 이동)</span><span>총 ${matches.length}개</span>`;
+      drop.appendChild(header);
 
       if (matches.length === 0) {
-        drop.innerHTML = '<div class="search-item"><span class="muted-text">일치하는 마을이 없습니다</span></div>';
+        const empty = document.createElement('div');
+        empty.className = 'search-item';
+        empty.innerHTML = '<span class="muted-text">일치하는 마을이 없습니다</span>';
+        drop.appendChild(empty);
         drop.classList.remove('hidden');
         return;
       }
 
-      drop.innerHTML = '';
       matches.forEach((v) => {
         const row = document.createElement('div');
-        row.className = 'search-item';
+        row.className = 'search-item' + (v.id === currentVillageId ? ' active' : '');
         row.innerHTML = `<strong>${v.name}마을</strong><span class="search-item-eup">${v.eupName}</span>`;
-        row.addEventListener('click', async () => {
-          drop.classList.add('hidden');
-          input.value = `${v.eupName} ${v.name}`;
-          if (currentRegionCode !== v.regionId) {
-            document.getElementById('region-select').value = v.regionId;
-            await selectRegion(v.regionId, v.id);
-          } else {
-            document.getElementById('village-select').value = v.id;
-            selectVillage(v.id, true);
-          }
+        row.addEventListener('click', () => {
+          jumpToAnyVillage(v);
         });
         drop.appendChild(row);
       });
       drop.classList.remove('hidden');
+    }
+
+    input.addEventListener('focus', () => {
+      renderDropdownList(input.value);
+    });
+
+    input.addEventListener('click', () => {
+      renderDropdownList(input.value);
+    });
+
+    input.addEventListener('input', () => {
+      renderDropdownList(input.value);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        drop.classList.add('hidden');
+      } else if (e.key === 'Enter') {
+        const q = input.value.trim().replace(/마을$/g, '').trim();
+        if (q && catalog && Array.isArray(catalog.villages)) {
+          const hit = catalog.villages.find(
+            (v) => v.name.includes(q) || v.eupName.includes(q) || `${v.eupName} ${v.name}`.includes(q)
+          );
+          if (hit) {
+            e.preventDefault();
+            jumpToAnyVillage(hit);
+          }
+        }
+      }
     });
 
     document.addEventListener('click', (e) => {
@@ -2964,6 +3963,114 @@ body.pick-start-mode #map {
     }
   }
 
+  function formatDataSourceKo(src) {
+    const s = String(src || '');
+    if (s.includes('sat')) return '위성 Mask2Former 실측 + VWorld';
+    if (s.includes('vworld')) return 'VWorld 국가공간정보 도로망';
+    return s || '방식 B 하이브리드';
+  }
+
+  function buildNaverPopupHtml(opts) {
+    const badgeClass = opts.badgeClass || 'info';
+    const cellsHtml = (opts.cells || [])
+      .map(
+        (c) => `
+        <div class="naver-popup-cell${c.full ? ' full' : ''}">
+          <span class="naver-popup-label">${c.label}</span>
+          <strong class="naver-popup-val">${c.value}</strong>
+        </div>`
+      )
+      .join('');
+
+    const actionsHtml =
+      opts.customActionsHtml !== undefined
+        ? opts.customActionsHtml
+        : `
+      <div class="naver-popup-actions">
+        <button type="button" class="naver-popup-btn btn-start" data-popup-action="set-start">
+          🟢 출발지로 설정
+        </button>
+        <button type="button" class="naver-popup-btn btn-target" data-popup-action="set-target">
+          🔴 화점(도착) 탐색
+        </button>
+      </div>`;
+
+    return `
+      <div class="naver-popup">
+        <div class="naver-popup-header">
+          <div class="naver-popup-top-row">
+            <span class="naver-popup-cat">${opts.category || '도로 링크'}</span>
+            <span class="naver-popup-badge ${badgeClass}">${opts.badgeText || '정보'}</span>
+          </div>
+          <div class="naver-popup-title">${opts.title || ''}</div>
+          ${opts.subtitle ? `<div class="naver-popup-sub">${opts.subtitle}</div>` : ''}
+        </div>
+        ${cellsHtml ? `<div class="naver-popup-grid">${cellsHtml}</div>` : ''}
+        ${actionsHtml}
+      </div>`;
+  }
+
+  function openNaverInfoPopup(lat, lng, opts, bldgRing) {
+    if (!map) return;
+    const html = buildNaverPopupHtml(opts);
+    const popup = L.popup({
+      maxWidth: 320,
+      minWidth: 290,
+      autoPanPadding: [24, 24],
+      closeButton: true
+    })
+      .setLatLng([lat, lng])
+      .setContent(html);
+
+    popup.on('add', () => {
+      const el = popup.getElement();
+      if (!el) return;
+      const btnStart = el.querySelector('[data-popup-action="set-start"]');
+      if (btnStart) {
+        btnStart.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          map.closePopup(popup);
+          ensureRouteSectionVisible();
+          setExactStartPoint(lat, lng);
+          if (lastMission && lastMission.targetLat && lastMission.targetLng) {
+            setRouteSelectStep('idle');
+            dispatchMissionTo(lastMission.targetLat, lastMission.targetLng, null, false);
+          } else {
+            setRouteSelectStep('pick_target');
+          }
+        });
+      }
+      const btnTarget = el.querySelector('[data-popup-action="set-target"]');
+      if (btnTarget) {
+        btnTarget.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          map.closePopup(popup);
+          setRouteSelectStep('idle');
+          ensureRouteSectionVisible();
+          dispatchMissionTo(lat, lng, bldgRing || null, false);
+        });
+      }
+      const btnCopy = el.querySelector('[data-popup-action="copy-deeplink"]');
+      if (btnCopy) {
+        btnCopy.addEventListener('click', async (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const url = btnCopy.getAttribute('data-copy-url') || '';
+          try {
+            await navigator.clipboard.writeText(url);
+            btnCopy.textContent = '✓ 딥링크 복사 완료';
+          } catch (_) {
+            btnCopy.textContent = '✓ 스킴 준비됨';
+          }
+        });
+      }
+    });
+
+    popup.openOn(map);
+  }
+
   function renderMapLayers() {
     roadLayerGroup.clearLayers();
     buildingLayerGroup.clearLayers();
@@ -2976,13 +4083,17 @@ body.pick-start-mode #map {
     const showNodes = document.getElementById('chk-layer-nodes').checked;
 
     if (showBuildings && currentIndex.buildings) {
-      currentIndex.buildings.forEach((ring) => {
+      currentIndex.buildings.forEach((ring, bIdx) => {
         const poly = L.polygon(ring, {
           color: '#64748b',
           weight: 1,
           fillColor: '#38bdf8',
           fillOpacity: 0.18
         });
+        poly.bindTooltip(
+          `<strong>🏢 건축물 #${bIdx + 1}</strong> · 클릭하여 건물 정보 및 출동 경로 탐색`,
+          { sticky: true }
+        );
         poly.on('click', (e) => {
           L.DomEvent.stopPropagation(e);
           if (routeSelectStep === 'pick_start') {
@@ -2990,7 +4101,26 @@ body.pick-start-mode #map {
             return;
           }
           const center = poly.getBounds().getCenter();
-          handleMapOrLayerClick(center.lat, center.lng, ring);
+          if (routeSelectStep === 'pick_target') {
+            handleMapOrLayerClick(center.lat, center.lng, ring);
+            return;
+          }
+          openNaverInfoPopup(
+            center.lat,
+            center.lng,
+            {
+              category: `건축물 #${bIdx + 1}`,
+              badgeClass: 'info',
+              badgeText: 'VWorld 건물 폴리곤',
+              title: '선택 건축물 출동·진입 판정',
+              subtitle: `중심좌표 ${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`,
+              cells: [
+                { label: '출동 기준 차량폭', value: `${currentThreshold}m` },
+                { label: '건축물대장 조회', value: '화점 탐색 시 자동 조회' }
+              ]
+            },
+            ring
+          );
         });
         poly.on('contextmenu', (e) => {
           L.DomEvent.stopPropagation(e);
@@ -3013,24 +4143,34 @@ body.pick-start-mode #map {
         let weight = 3.2;
         let dashArray = null;
         let statusKo = '폭원 미상';
+        let badgeClass = 'info';
+        let badgeText = '● 폭원 미상';
 
         if (stObj.status === 'passable') {
           color = '#22c55e';
           weight = 3.8;
           statusKo = '차량 진입 가능';
+          badgeClass = 'pass';
+          badgeText = '● 차량 진입 가능';
         } else if (stObj.status === 'blocked_turn') {
           color = '#f97316';
           weight = 4.2;
           statusKo = `회전반경 부족 차단 (${stObj.turnInfo ? stObj.turnInfo.turnAngleDeg + '° 코너 유효폭 ' + stObj.turnInfo.cornerWidthM + 'm < 요구 ' + stObj.turnInfo.requiredCornerWidthM + 'm' : ''})`;
+          badgeClass = 'turn';
+          badgeText = '▲ 회전반경 부족 차단';
         } else if (stObj.status === 'blocked_width') {
           color = '#ef4444';
           weight = 3.4;
           statusKo = `도로 폭원 미달 (${stObj.widthM}m < ${currentThreshold}m)`;
+          badgeClass = 'block';
+          badgeText = '■ 도로 폭원 미달';
         } else if (stObj.status === 'disconnected') {
           color = '#ef4444';
           weight = 3.0;
           dashArray = '5,5';
           statusKo = '선행 병목으로 인한 진입 단절';
+          badgeClass = 'block';
+          badgeText = '◆ 선행 병목 단절';
         }
 
         const line = L.polyline(edge.coords, {
@@ -3042,12 +4182,42 @@ body.pick-start-mode #map {
 
         const wLabel = stObj.widthM !== null ? `${stObj.widthM}m` : '미상';
         line.bindTooltip(
-          `<strong>[${statusKo}]</strong><br/>유효폭: ${wLabel} (진입 ${edge.ew ?? '-'}m / 진출 ${edge.xw ?? '-'}m)<br/>연장: ${edge.lengthM}m · 출처: ${edge.source}<br/><span style="color:#93c5fd">[경로탐색] 클릭 후 ① 출발지 → ② 화점 선택 (우클릭: 즉시 출발지 지정)</span>`,
+          `<strong>[${statusKo}]</strong> 도로 링크 #${edge.linkId}<br/>유효폭: <strong>${wLabel}</strong> (기준 ${currentThreshold}m) · 연장: <strong>${edge.lengthM}m</strong><br/><span style="color:#03c75a;font-weight:700">클릭하여 상세 제원 팝업 및 출발·화점 지정</span>`,
           { sticky: true }
         );
         line.on('click', (e) => {
           L.DomEvent.stopPropagation(e);
-          handleMapOrLayerClick(e.latlng.lat, e.latlng.lng, null);
+          if (routeSelectStep !== 'idle') {
+            handleMapOrLayerClick(e.latlng.lat, e.latlng.lng, null);
+            return;
+          }
+          const cells = [
+            { label: '유효 도로폭 / 기준폭', value: `${wLabel} / ${currentThreshold}m` },
+            { label: '구간 연장', value: `${edge.lengthM} m` },
+            { label: '진입폭 / 진출폭', value: `${edge.ew ?? wLabel} / ${edge.xw ?? wLabel}` },
+            { label: '연결 정점 (시점→종점)', value: `${edge.u || '-'} → ${edge.v || '-'}` }
+          ];
+          if (stObj.turnInfo) {
+            cells.push({
+              label: '아커만 회전반경 판정',
+              value: `${stObj.turnInfo.turnAngleDeg}° 교차 코너 유효폭 ${stObj.turnInfo.cornerWidthM}m (요구 ${stObj.turnInfo.requiredCornerWidthM}m)`,
+              full: true
+            });
+          }
+          cells.push({
+            label: '도로폭 산출 출처',
+            value: formatDataSourceKo(edge.source),
+            full: true
+          });
+
+          openNaverInfoPopup(e.latlng.lat, e.latlng.lng, {
+            category: `도로 링크 #${edge.linkId}`,
+            badgeClass: badgeClass,
+            badgeText: badgeText,
+            title: `유효폭 ${wLabel} · 연장 ${edge.lengthM}m`,
+            subtitle: statusKo,
+            cells: cells
+          });
         });
         line.on('contextmenu', (e) => {
           L.DomEvent.stopPropagation(e);
@@ -3059,7 +4229,7 @@ body.pick-start-mode #map {
     }
 
     if (showHydrants && currentIndex.hydrants) {
-      currentIndex.hydrants.forEach((h) => {
+      currentIndex.hydrants.forEach((h, hIdx) => {
         const marker = L.circleMarker([h[0], h[1]], {
           radius: 5,
           color: '#fff',
@@ -3067,7 +4237,25 @@ body.pick-start-mode #map {
           fillColor: '#ef4444',
           fillOpacity: 0.95
         });
-        marker.bindTooltip(`소화용수: ${h[2]}`, { direction: 'top' });
+        marker.bindTooltip(`<strong>🧯 소화용수:</strong> ${h[2]} (클릭하여 상세 보기)`, { direction: 'top' });
+        marker.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          if (routeSelectStep !== 'idle') {
+            handleMapOrLayerClick(h[0], h[1], null);
+            return;
+          }
+          openNaverInfoPopup(h[0], h[1], {
+            category: `소화용수 거점 #${hIdx + 1}`,
+            badgeClass: 'info',
+            badgeText: '🧯 소방용수시설',
+            title: String(h[2] || '소화전'),
+            subtitle: `좌표 ${Number(h[0]).toFixed(5)}, ${Number(h[1]).toFixed(5)}`,
+            cells: [
+              { label: '시설 구분', value: '지상식 소화전 / 급수탑' },
+              { label: '전술 활용', value: '하차 거점 인근 중계 방수' }
+            ]
+          });
+        });
         hydrantLayerGroup.addLayer(marker);
       });
     }
@@ -3075,6 +4263,12 @@ body.pick-start-mode #map {
     if (showNodes && currentIndex.nodes) {
       currentIndex.nodes.forEach((n) => {
         const c = n.type === 'intersection' ? '#38bdf8' : n.type === 'dead_end' ? '#f43f5e' : '#a855f7';
+        const typeKo =
+          n.type === 'intersection'
+            ? '교차로 정점 (X)'
+            : n.type === 'dead_end'
+            ? '막다른길 끝점 (D)'
+            : '폭원 전환 정점 (T)';
         const m = L.circleMarker([n.lat, n.lng], {
           radius: 3.5,
           color: c,
@@ -3082,10 +4276,24 @@ body.pick-start-mode #map {
           fillColor: c,
           fillOpacity: 0.85
         });
-        m.bindTooltip(`정점 ${n.id} (${n.type}) · 최소폭 ${n.minWidthM ?? '-'}m`);
+        m.bindTooltip(`<strong>${typeKo}</strong> ${n.id} · 최소폭 ${n.minWidthM ?? '-'}m`);
         m.on('click', (e) => {
           L.DomEvent.stopPropagation(e);
-          handleMapOrLayerClick(n.lat, n.lng, null);
+          if (routeSelectStep !== 'idle') {
+            handleMapOrLayerClick(n.lat, n.lng, null);
+            return;
+          }
+          openNaverInfoPopup(n.lat, n.lng, {
+            category: `도로망 정점 ${n.id}`,
+            badgeClass: n.type === 'dead_end' ? 'block' : 'info',
+            badgeText: typeKo,
+            title: `정점 ${n.id} (${typeKo})`,
+            subtitle: `좌표 ${n.lat.toFixed(5)}, ${n.lng.toFixed(5)}`,
+            cells: [
+              { label: '접속 도로 최소폭', value: `${n.minWidthM ?? '-'} m` },
+              { label: '정점 유형', value: n.type }
+            ]
+          });
         });
         m.on('contextmenu', (e) => {
           L.DomEvent.stopPropagation(e);
@@ -3145,11 +4353,29 @@ body.pick-start-mode #map {
       diag.rawCenterlines.forEach((row) => {
         const poly = L.polyline(row[6], {
           color: '#cbd5e1',
-          weight: 1.5,
+          weight: 2.2,
           dashArray: '3,4',
-          opacity: 0.75
+          opacity: 0.85
         });
         poly.bindTooltip(`원시링크 #${row[0]} · WFS폭 ${row[2] ?? '-'}m · 방식B폭 ${row[4] ?? '-'}m (${row[5]})`);
+        poly.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          if (routeSelectStep !== 'idle') {
+            handleMapOrLayerClick(e.latlng.lat, e.latlng.lng, null);
+            return;
+          }
+          openNaverInfoPopup(e.latlng.lat, e.latlng.lng, {
+            category: `원시 중심선 #${row[0]}`,
+            badgeClass: 'info',
+            badgeText: 'VWorld WFS 원시 링크',
+            title: `방식 B 보정폭 ${row[4] ?? '-'}m (원시 ${row[2] ?? '-'}m)`,
+            subtitle: `데이터 출처: ${formatDataSourceKo(row[5])}`,
+            cells: [
+              { label: 'VWorld WFS 도로폭', value: `${row[2] ?? '-'} m` },
+              { label: '방식 B 최종 유효폭', value: `${row[4] ?? '-'} m` }
+            ]
+          });
+        });
         diagLayerGroup.addLayer(poly);
       });
     }
@@ -3159,9 +4385,27 @@ body.pick-start-mode #map {
         const poly = L.polyline(row[2], {
           color: '#c084fc',
           weight: 5,
-          opacity: 0.65
+          opacity: 0.75
         });
         poly.bindTooltip(`Mask2Former 위성 실측폭: ${row[1]}m (링크 #${row[0]})`);
+        poly.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          if (routeSelectStep !== 'idle') {
+            handleMapOrLayerClick(e.latlng.lat, e.latlng.lng, null);
+            return;
+          }
+          openNaverInfoPopup(e.latlng.lat, e.latlng.lng, {
+            category: `위성 실측 링크 #${row[0]}`,
+            badgeClass: 'info',
+            badgeText: '🛰 Mask2Former 실측',
+            title: `위성 AI 도로 분할 실측폭 ${row[1]}m`,
+            subtitle: 'VWorld 1024×1024 위성영상 직교 프로파일 분석',
+            cells: [
+              { label: '위성 실측 도로폭', value: `${row[1]} m` },
+              { label: '적용 모델', value: 'Mask2Former (ADE20K)' }
+            ]
+          });
+        });
         diagLayerGroup.addLayer(poly);
       });
     }
@@ -3169,12 +4413,26 @@ body.pick-start-mode #map {
     if (showSplits && diag.mergedSplits) {
       diag.mergedSplits.forEach((pt) => {
         const cm = L.circleMarker([pt[0], pt[1]], {
-          radius: 3.5,
+          radius: 4,
           color: '#38bdf8',
           fillColor: '#0284c7',
           fillOpacity: 0.9
         });
         cm.bindTooltip(`중심선 분절 병합점 (링크 ${pt[2]} ↔ ${pt[3]})`);
+        cm.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          openNaverInfoPopup(pt[0], pt[1], {
+            category: '위상 그래프 병합점',
+            badgeClass: 'info',
+            badgeText: 'degree=2 분절 통합',
+            title: `링크 #${pt[2]} ↔ #${pt[3]} 병합 지점`,
+            subtitle: '동일 도로 구간 내 불필요 분절점 자동 병합',
+            cells: [
+              { label: '병합 링크 A', value: `#${pt[2]}` },
+              { label: '병합 링크 B', value: `#${pt[3]}` }
+            ]
+          });
+        });
         diagLayerGroup.addLayer(cm);
       });
     }
@@ -3186,6 +4444,49 @@ body.pick-start-mode #map {
     const m = Math.floor(s / 60);
     const rem = s % 60;
     return rem > 0 ? `${m}분 ${rem}초` : `${m}분`;
+  }
+
+  function approxDistM(lat1, lng1, lat2, lng2) {
+    const R = 6371000.0;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180.0;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180.0;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180.0) *
+        Math.cos((lat2 * Math.PI) / 180.0) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(Math.max(0, 1 - a)));
+  }
+
+  function sampleEntryAnchorPoint(coords, goalLat, goalLng) {
+    if (!Array.isArray(coords) || coords.length < 2) return null;
+    const segLens = [];
+    let total = 0.0;
+    for (let i = 0; i < coords.length - 1; i++) {
+      const d = approxDistM(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
+      segLens.push(d);
+      total += d;
+    }
+    if (total < 20.0) return null;
+    const target = total >= 45.0 ? 18.0 : total * 0.3;
+    let acc = 0.0;
+    for (let i = 0; i < segLens.length; i++) {
+      const seg = segLens[i];
+      if (acc + seg >= target || i === segLens.length - 1) {
+        const t = seg > 1e-6 ? Math.max(0.0, Math.min(1.0, (target - acc) / seg)) : 0.0;
+        const lat = Number((coords[i][0] + t * (coords[i + 1][0] - coords[i][0])).toFixed(6));
+        const lng = Number((coords[i][1] + t * (coords[i + 1][1] - coords[i][1])).toFixed(6));
+        const dStart = approxDistM(coords[0][0], coords[0][1], lat, lng);
+        const dGoal = approxDistM(goalLat, goalLng, lat, lng);
+        if (dStart >= 6.0 && dGoal >= 8.0) {
+          return { nodeId: '출발진입점', lat: lat, lng: lng };
+        }
+        return null;
+      }
+      acc += seg;
+    }
+    return null;
   }
 
   function updateNavigationDeeplinks(route) {
@@ -3242,13 +4543,39 @@ body.pick-start-mode #map {
       }
     }
 
+    // 1. T맵: tmap://route는 실시간 GPS 내비게이션을 즉시 시작하여 출발지를 '현위치(GPS)'로 덮어쓰므로,
+    //    사용자가 선택한 출발지(startLat, startLng)를 제1경유지(rV1)로 강제 주입하고 이어서 안전 우회 경유지(rV2~rV5)를 배치
     if (tmapEl) {
-      // Prioritize first and last detour waypoints into rV1/rV2 when >2 waypoints exist
-      const orderedTmapVias =
-        vias.length > 2 ? [vias[0], vias[vias.length - 1], ...vias.slice(1, -1)].slice(0, 5) : vias.slice(0, 5);
-      const viaParams = orderedTmapVias
+      const prioritizedDetours =
+        vias.length > 2 ? [vias[0], vias[vias.length - 1], ...vias.slice(1, -1)] : vias.slice();
+      const tmapVias = [];
+      const distStartToGoal = approxDistM(Number(startLat), Number(startLng), Number(goalLat), Number(goalLng));
+      if (distStartToGoal >= 5.0) {
+        const firstViaCloseToStart =
+          prioritizedDetours.length > 0 &&
+          approxDistM(
+            Number(startLat),
+            Number(startLng),
+            Number(prioritizedDetours[0].lat),
+            Number(prioritizedDetours[0].lng)
+          ) < 6.0;
+        if (!firstViaCloseToStart) {
+          tmapVias.push({
+            nodeId: startName,
+            lat: Number(startLat),
+            lng: Number(startLng),
+            isStartAnchor: true
+          });
+        }
+      }
+      prioritizedDetours.forEach((v) => {
+        if (tmapVias.length < 5) tmapVias.push(v);
+      });
+
+      const viaParams = tmapVias
         .map((v, idx) => {
-          const vName = encodeURIComponent(`안전경유${idx + 1}(${v.nodeId})`);
+          const label = v.isStartAnchor ? `출발경유(${v.nodeId})` : `안전경유${idx + 1}(${v.nodeId})`;
+          const vName = encodeURIComponent(label);
           const vx = Number(v.lng).toFixed(6);
           const vy = Number(v.lat).toFixed(6);
           return `&rV${idx + 1}Name=${vName}&rV${idx + 1}X=${vx}&rV${idx + 1}Y=${vy}&via${idx + 1}name=${vName}&via${idx + 1}x=${vx}&via${idx + 1}y=${vy}`;
@@ -3262,21 +4589,52 @@ body.pick-start-mode #map {
         `${viaParams}&reqCoordType=WGS84&resCoordType=WGS84`;
     }
 
+    // 2. 네이버지도 & 카카오맵 공통: 길찾기 초기 화면에서는 slat/slng(sp)로 출발지를 강제 고정하고,
+    //    앱 내에서 [안내 시작](실시간 내비)을 눌러 출발지가 현위치(GPS)로 바뀌더라도 선택한 출발 도로 구간을
+    //    무조건 통과하도록 출발지 직후 진입 고정점(출발진입점, ~18m 전방)을 v1/vp 제1경유지로 확보
+    const routeVias = [];
+    if (!useStationStart) {
+      const entryAnchor = sampleEntryAnchorPoint(
+        route.vehicleRouteCoords,
+        Number(goalLat),
+        Number(goalLng)
+      );
+      if (entryAnchor) {
+        const firstViaAlreadyNearAnchor =
+          vias.length > 0 &&
+          approxDistM(entryAnchor.lat, entryAnchor.lng, Number(vias[0].lat), Number(vias[0].lng)) < 15.0;
+        if (!firstViaAlreadyNearAnchor) {
+          routeVias.push(entryAnchor);
+        }
+      }
+    }
+    vias.forEach((v) => {
+      if (routeVias.length < 5) routeVias.push(v);
+    });
+
     if (naverEl) {
-      const vParams = vias
+      const vParams = routeVias
         .map(
           (v, idx) =>
-            `&v${idx + 1}lat=${Number(v.lat).toFixed(6)}&v${idx + 1}lng=${Number(v.lng).toFixed(6)}&v${idx + 1}name=${encodeURIComponent('안전경유' + (idx + 1))}`
+            `&v${idx + 1}lat=${Number(v.lat).toFixed(6)}&v${idx + 1}lng=${Number(v.lng).toFixed(6)}&v${idx + 1}name=${encodeURIComponent(
+              v.nodeId === '출발진입점' ? '출발진입점' : '안전경유' + (idx + 1) + '(' + v.nodeId + ')'
+            )}`
         )
         .join('');
-      // Use nmap://route/car (supports slat/slng start + v1..v5 waypoints + dlat/dlng destination; legacy nmap://navigation only supports destination)
+      // 네이버 공식 파라미터 순서: 출발지(slat/slng/sname) → 경유지(v1..v5) → 도착지(dlat/dlng/dname) → appname
       naverEl.href =
         `nmap://route/car?slat=${startLat}&slng=${startLng}&sname=${encodeURIComponent(startName)}` +
-        `&dlat=${goalLat}&dlng=${goalLng}&dname=${encodeURIComponent(goalName)}${vParams}&appname=fireway119.pages.dev`;
+        `${vParams}&dlat=${goalLat}&dlng=${goalLng}&dname=${encodeURIComponent(goalName)}&appname=fireway119.pages.dev`;
     }
 
     if (kakaoEl) {
-      const kVias = vias.map((v) => `&vp=${Number(v.lat).toFixed(6)},${Number(v.lng).toFixed(6)}`).join('');
+      // 카카오맵 공식 다중 경유지 규격: 1번째 경유지는 vp=, 2~5번째 경유지는 vp2=, vp3=, vp4=, vp5=
+      const kVias = routeVias
+        .map((v, idx) => {
+          const paramName = idx === 0 ? 'vp' : `vp${idx + 1}`;
+          return `&${paramName}=${Number(v.lat).toFixed(6)},${Number(v.lng).toFixed(6)}`;
+        })
+        .join('');
       kakaoEl.href = `kakaomap://route?sp=${startLat},${startLng}&ep=${goalLat},${goalLng}${kVias}&by=car`;
     }
   }
@@ -3424,13 +4782,27 @@ body.pick-start-mode #map {
 
     // Draw 1st-stage vehicle route
     if (route.vehicleRouteCoords && route.vehicleRouteCoords.length >= 2) {
-      L.polyline(route.vehicleRouteCoords, {
+      const vehPoly = L.polyline(route.vehicleRouteCoords, {
         color: '#00f0ff',
         weight: 6,
         opacity: 0.92
       })
         .bindTooltip(`1차 소방차 진입 경로 (${startLabel} → ${route.stagingNodeId}, ${route.vehicleDistanceM}m)`)
         .addTo(missionLayerGroup);
+      vehPoly.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        openNaverInfoPopup(e.latlng.lat, e.latlng.lng, {
+          category: '1차 소방차 진입 경로',
+          badgeClass: 'pass',
+          badgeText: '🚒 차량 주행 구간',
+          title: `${startLabel} → ${route.stagingNodeId}`,
+          subtitle: `총 주행 거리 ${route.vehicleDistanceM}m · 예상 ${formatSecKo(route.villageDriveSec)}`,
+          cells: [
+            { label: '1차 차량 진입 거리', value: `${route.vehicleDistanceM} m` },
+            { label: '안전 우회 경유지', value: `${(route.navVia || []).length} 개소` }
+          ]
+        });
+      });
     }
 
     // Draw safe detour waypoints (navVia) extracted for TMAP passList / Naver / Kakao
@@ -3442,15 +4814,29 @@ body.pick-start-mode #map {
           iconSize: [44, 20],
           iconAnchor: [22, 10]
         });
-        L.marker([via.lat, via.lng], { icon: badgeIcon })
+        const viaMarker = L.marker([via.lat, via.lng], { icon: badgeIcon })
           .bindTooltip(`안전 우회 경유지 #${idx + 1} (정점 ${via.nodeId} · 협소/회전불가 구간 우회)`)
           .addTo(missionLayerGroup);
+        viaMarker.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          openNaverInfoPopup(via.lat, via.lng, {
+            category: `안전 우회 경유지 #${idx + 1}`,
+            badgeClass: 'info',
+            badgeText: `정점 ${via.nodeId}`,
+            title: `T맵·네이버·카카오 제${idx + 1}경유지`,
+            subtitle: '협소 도로 및 회전반경 미달 교차로 우회 지점',
+            cells: [
+              { label: '경유 정점 ID', value: String(via.nodeId) },
+              { label: '경유 좌표', value: `${via.lat.toFixed(5)}, ${via.lng.toFixed(5)}` }
+            ]
+          });
+        });
       });
     }
 
     // Draw 2nd-stage fire hose extension route
     if (!route.directVehicleAccess && route.hoseRouteCoords && route.hoseRouteCoords.length >= 2) {
-      L.polyline(route.hoseRouteCoords, {
+      const hosePoly = L.polyline(route.hoseRouteCoords, {
         color: '#ff3b30',
         weight: 5,
         dashArray: '8,6',
@@ -3458,6 +4844,20 @@ body.pick-start-mode #map {
       })
         .bindTooltip(`2차 소방호스 도보 연장 경로 (${route.hoseDistanceM}m · 15m 호스 ${route.requiredHose15mCount}본)`)
         .addTo(missionLayerGroup);
+      hosePoly.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        openNaverInfoPopup(e.latlng.lat, e.latlng.lng, {
+          category: '2차 소방호스 연장 경로',
+          badgeClass: 'block',
+          badgeText: '🧯 도보 호스 전개',
+          title: `호스 연장 ${route.hoseDistanceM}m (${route.requiredHose15mCount}본)`,
+          subtitle: route.bottleneck ? route.bottleneck.message : '차량 진입 한계 이후 도보 전개 구간',
+          cells: [
+            { label: '2차 호스 연장 거리', value: `${route.hoseDistanceM} m` },
+            { label: '15m 소방호스 소요', value: `${route.requiredHose15mCount} 본 (예비포함 ${route.requiredHoseWithSpareCount || route.requiredHose15mCount}본)` }
+          ]
+        });
+      });
 
       const stgMarker = L.circleMarker(route.stagingPoint, {
         radius: 7,
@@ -3470,10 +4870,24 @@ body.pick-start-mode #map {
         permanent: true,
         direction: 'top'
       });
+      stgMarker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        openNaverInfoPopup(route.stagingPoint[0], route.stagingPoint[1], {
+          category: '소방차 하차·전개 거점',
+          badgeClass: 'turn',
+          badgeText: `거점 ${route.stagingNodeId}`,
+          title: `하차 거점 (${route.stagingNodeId})`,
+          subtitle: '1차 차량 진입 종점 · 2차 소방호스 전개 시작점',
+          cells: [
+            { label: '출발 → 거점 거리', value: `${route.vehicleDistanceM} m` },
+            { label: '거점 → 화점 호스', value: `${route.hoseDistanceM} m (${route.requiredHose15mCount}본)` }
+          ]
+        });
+      });
     }
 
     // Target fire marker
-    L.circleMarker([lat, lng], {
+    const targetMarker = L.circleMarker([lat, lng], {
       radius: 8,
       color: '#fff',
       weight: 2,
@@ -3482,6 +4896,20 @@ body.pick-start-mode #map {
     })
       .bindTooltip('화점 / 출동 목표지점', { permanent: true, direction: 'right' })
       .addTo(missionLayerGroup);
+    targetMarker.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      openNaverInfoPopup(lat, lng, {
+        category: '화점 / 출동 목표지점',
+        badgeClass: route.directVehicleAccess ? 'pass' : 'block',
+        badgeText: route.directVehicleAccess ? '차량 직접 진입' : `호스 ${route.requiredHose15mCount}본 연장`,
+        title: lastBuildingInfo && lastBuildingInfo.roadAddress ? lastBuildingInfo.roadAddress : `화점 (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
+        subtitle: lastBuildingInfo && lastBuildingInfo.mainUse ? `${lastBuildingInfo.mainUse} · ${lastBuildingInfo.structure || '구조 확인'}` : '좌측 [화점·AI] 탭에서 건축물대장 상세 확인',
+        cells: [
+          { label: '1차 차량 진입', value: `${route.vehicleDistanceM} m` },
+          { label: '2차 호스 연장', value: `${route.hoseDistanceM} m (${route.requiredHose15mCount}본)` }
+        ]
+      });
+    });
 
     if (route.nearestHydrant) {
       L.polyline([route.stagingPoint, [route.nearestHydrant.lat, route.nearestHydrant.lng]], {
@@ -3533,6 +4961,79 @@ body.pick-start-mode #map {
     } else {
       await generateAiBriefing(false);
     }
+  }
+
+  function openNavAppInfoPopup(appType, deeplinkUrl) {
+    if (!lastMission || !lastMission.found || !lastMission.stagingPoint) {
+      showNudgeBanner('안내: 먼저 [경로탐색]을 통해 출발지와 화점을 선택하면 3대 내비게이션 길안내 팝업이 활성화됩니다.');
+      return;
+    }
+    const route = lastMission;
+    const st = window.FirewayGraphEngine && window.FirewayGraphEngine.FIRE_STATION;
+    const rawStartPt =
+      Array.isArray(route.startPoint) && route.startPoint.length === 2
+        ? route.startPoint
+        : customStartPoint
+        ? [customStartPoint.lat, customStartPoint.lng]
+        : route.stagingPoint;
+
+    const startLat = useStationStart && st ? Number(st.lat) : Number(rawStartPt[0]);
+    const startLng = useStationStart && st ? Number(st.lng) : Number(rawStartPt[1]);
+    const startName = useStationStart && st ? st.name || '의령소방서' : '선택출발지';
+    const goalLat = Number(route.stagingPoint[0]);
+    const goalLng = Number(route.stagingPoint[1]);
+    const goalName = route.directVehicleAccess
+      ? `화점진입(${route.stagingNodeId})`
+      : `하차거점(${route.stagingNodeId})`;
+    const viaCount = Array.isArray(route.navVia) ? route.navVia.length : 0;
+
+    let appTitle = '네이버 지도 길안내';
+    let badgeText = 'NAVER 지도 연동';
+    let badgeClass = 'pass';
+    let webUrl = `https://map.naver.com/p/directions/-/${goalLng},${goalLat},${encodeURIComponent(goalName)}/-/car`;
+
+    if (appType === 'tmap') {
+      appTitle = 'T맵 (TMAP) 실시간 길안내';
+      badgeText = 'TMAP 출동 내비';
+      badgeClass = 'info';
+      webUrl = `https://map.naver.com/p/directions/-/${goalLng},${goalLat},${encodeURIComponent(goalName)}/-/car`;
+    } else if (appType === 'kakao') {
+      appTitle = '카카오맵 (KakaoMap) 길안내';
+      badgeText = 'Kakao 내비 연동';
+      badgeClass = 'turn';
+      webUrl = `https://map.kakao.com/link/to/${encodeURIComponent(goalName)},${goalLat},${goalLng}`;
+    }
+
+    const customActionsHtml = `
+      <div class="naver-popup-actions">
+        <a href="${deeplinkUrl}" class="naver-popup-btn btn-start">
+          📱 모바일 앱 실행
+        </a>
+        <a href="${webUrl}" target="_blank" rel="noopener" class="naver-popup-btn btn-target">
+          🌐 PC 웹 지도 열기
+        </a>
+        <button type="button" class="naver-popup-btn full" data-popup-action="copy-deeplink" data-copy-url="${deeplinkUrl.replace(/"/g, '&quot;')}">
+          📋 길안내 딥링크 URL 복사
+        </button>
+      </div>`;
+
+    openNaverInfoPopup(goalLat, goalLng, {
+      category: '출동 내비게이션 연동',
+      badgeClass: badgeClass,
+      badgeText: badgeText,
+      title: appTitle,
+      subtitle: `${startName} → 경유 ${viaCount}개소 → ${goalName}`,
+      cells: [
+        { label: '출발지 좌표', value: `${startLat.toFixed(5)}, ${startLng.toFixed(5)}` },
+        { label: '도착 거점 좌표', value: `${goalLat.toFixed(5)}, ${goalLng.toFixed(5)}` },
+        {
+          label: '안전 우회 경유지',
+          value: viaCount > 0 ? `${viaCount}개소 (${route.navVia.map((v) => v.nodeId).join(' → ')})` : '직결 진입 (우회 없음)',
+          full: true
+        }
+      ],
+      customActionsHtml: customActionsHtml
+    });
   }
 
   const PURPOSE_CODE_MAP = {
@@ -4026,30 +5527,525 @@ body.pick-start-mode #map {
     }
   }
 
+  const TUTORIAL_STEPS = [
+    {
+      targets: ['control-item-village-select', 'control-item-village-search', 'control-item-vehicle'],
+      title: '1단계: 출동 마을(239개 전체) 및 소방차량 선택',
+      desc:
+        '상단 <strong>전체 마을 선택 드롭다운(239개)</strong> 또는 <strong>마을 통합 검색창</strong>을 클릭하여 의령군 13개 읍·면 모든 마을을 선택할 수 있습니다. 함께 출동할 <strong>소방차량 제원(경형·소형·중형·대형)</strong>을 설정합니다.',
+      panel: 'top'
+    },
+    {
+      targets: ['btn-route-search'],
+      title: '2단계: [경로탐색] 버튼 클릭',
+      desc:
+        '상단 우측의 <strong>[경로탐색]</strong> 버튼을 클릭하면 지도 위에서 <strong>① 출발지 → ② 화점</strong>을 순서대로 지정하는 경로 탐색 모드가 시작됩니다.',
+      panel: 'top'
+    },
+    {
+      targets: ['map-container'],
+      title: '3단계: 지도에서 ① 출발지 → ② 화점 클릭',
+      desc:
+        '확대된 지도 위에서 소방차가 진입을 시작할 <strong>① 출발지</strong>를 먼저 클릭한 뒤, 화재가 발생한 <strong>② 화점(목표 건물·지점)</strong>을 클릭하면 <strong>1차 소방차 진입 경로(청록색)</strong>와 <strong>2차 소방호스 연장 경로(적색 점선)</strong>가 즉시 산출됩니다.',
+      panel: 'map',
+      zoomInMap: true,
+      bannerPreview:
+        '1/2단계 [출발지 선택] → 2/2단계 [화점 선택]: 지도 위에서 출발지와 화점을 순서대로 클릭하세요'
+    }
+  ];
+
+  let tutorialActive = false;
+  let tutorialStepIdx = 0;
+  let tutorialBaseZoom = null;
+  let tutorialZoomedIn = false;
+
+  function clearTutorialHighlights() {
+    document.querySelectorAll('.tutorial-target-active').forEach((el) => {
+      el.classList.remove('tutorial-target-active');
+    });
+  }
+
+  function startTutorial() {
+    tutorialActive = true;
+    tutorialStepIdx = 0;
+    tutorialBaseZoom = map ? map.getZoom() : null;
+    tutorialZoomedIn = false;
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+    renderTutorialStep();
+  }
+
+  function closeTutorial() {
+    tutorialActive = false;
+    tutorialZoomedIn = false;
+    clearTutorialHighlights();
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) overlay.classList.add('hidden');
+    if (routeSelectStep === 'idle') {
+      const banner = document.getElementById('map-pick-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+  }
+
+  let currentDrawerTab = 'all';
+  const THEME_STORAGE_KEY = 'fireway_ui_theme_v2';
+
+  const DRAWER_TAB_META = {
+    all: {
+      icon: '📋',
+      title: '전체 통합 전술 메뉴',
+      desc: '길찾기 · 화점/AI · 마을현황 · 레이어 전체 표시'
+    },
+    route: {
+      icon: '🚒',
+      title: '출동 길찾기 · 전술 브리핑',
+      desc: '차량 제원 선택 · 출발/화점 경로탐색 · 내비 연동'
+    },
+    brief: {
+      icon: '🏢',
+      title: '화점 건축물대장 · AI 브리핑',
+      desc: '실시간 VWorld 주소·건축물대장 표제부 · AI 지휘 브리핑'
+    },
+    status: {
+      icon: '📊',
+      title: '지역 도로망 현황 · 마을 목록',
+      desc: '진입 가능/차단 통계 및 현재 읍·면 마을 빠른 이동'
+    },
+    layer: {
+      icon: '🗂',
+      title: '공간 진단 레이어 · 범례',
+      desc: '방식 B 도로망 · 위성 실측 · 분절 병합점 · 범례'
+    }
+  };
+
+  function setDrawerCollapsed(collapsed) {
+    const leftPanel = document.getElementById('left-panel');
+    const btnToggleLeft = document.getElementById('btn-toggle-left-panel');
+    if (!leftPanel) return;
+    leftPanel.classList.toggle('collapsed', Boolean(collapsed));
+    if (btnToggleLeft) {
+      btnToggleLeft.textContent = collapsed ? '▶' : '◀';
+      btnToggleLeft.title = collapsed ? '좌측 통합 드로어 펼치기' : '좌측 통합 드로어 접기';
+    }
+    refreshMapSizeAfterPanelChange();
+  }
+
+  function switchDrawerTab(tabName, expandIfCollapsed = true) {
+    const nextTab = DRAWER_TAB_META[tabName] ? tabName : 'all';
+    currentDrawerTab = nextTab;
+
+    const leftPanel = document.getElementById('left-panel');
+    if (expandIfCollapsed && leftPanel && leftPanel.classList.contains('collapsed')) {
+      setDrawerCollapsed(false);
+    }
+
+    document.querySelectorAll('#naver-rail .rail-tab[data-drawer-tab]').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.drawerTab === nextTab);
+    });
+
+    const meta = DRAWER_TAB_META[nextTab] || DRAWER_TAB_META.all;
+    const iconEl = document.getElementById('drawer-tab-icon');
+    const titleEl = document.getElementById('drawer-tab-title');
+    const descEl = document.getElementById('drawer-tab-desc');
+    const showAllBtn = document.getElementById('btn-drawer-show-all');
+    if (iconEl) iconEl.textContent = meta.icon;
+    if (titleEl) titleEl.textContent = meta.title;
+    if (descEl) descEl.textContent = meta.desc;
+    if (showAllBtn) showAllBtn.classList.toggle('hidden', nextTab === 'all');
+
+    const rightPanel = document.getElementById('right-panel');
+    if (rightPanel) {
+      const hasRightSection = nextTab === 'all' || nextTab === 'route' || nextTab === 'brief';
+      rightPanel.classList.toggle('tab-hidden', !hasRightSection);
+      if (hasRightSection) {
+        rightPanel.classList.remove('collapsed');
+        const btnToggleRight = document.getElementById('btn-toggle-right-panel');
+        if (btnToggleRight) btnToggleRight.textContent = '브리핑 접기';
+      }
+    }
+
+    document.querySelectorAll('#left-panel [data-tab-section]').forEach((sec) => {
+      const secType = sec.getAttribute('data-tab-section');
+      const visible = nextTab === 'all' || secType === nextTab;
+      sec.classList.toggle('tab-hidden', !visible);
+      sec.style.display = visible ? '' : 'none';
+    });
+
+    if (leftPanel && expandIfCollapsed) {
+      leftPanel.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function ensureRouteSectionVisible() {
+    if (currentDrawerTab !== 'all' && currentDrawerTab !== 'route') {
+      switchDrawerTab('route', true);
+    } else {
+      const leftPanel = document.getElementById('left-panel');
+      if (leftPanel && leftPanel.classList.contains('collapsed')) {
+        setDrawerCollapsed(false);
+      }
+    }
+  }
+
+  function syncVehicleTabs(widthVal) {
+    const numVal = Number(widthVal) || 2.2;
+    document.querySelectorAll('.veh-tab[data-veh-width]').forEach((btn) => {
+      const bVal = Number(btn.dataset.vehWidth);
+      btn.classList.toggle('active', Math.abs(bVal - numVal) < 0.01);
+    });
+  }
+
+  function applyTheme(mode) {
+    const isNaver = mode !== 'dark';
+    document.body.classList.toggle('theme-naver', isNaver);
+
+    const btnHeaderTheme = document.getElementById('btn-toggle-theme');
+    if (btnHeaderTheme) {
+      btnHeaderTheme.classList.toggle('active', isNaver);
+      btnHeaderTheme.textContent = isNaver ? '🌙 다크 테마' : '☀️ 네이버 테마';
+    }
+
+    const btnRailTheme = document.getElementById('btn-rail-theme');
+    if (btnRailTheme) {
+      btnRailTheme.classList.toggle('active', isNaver);
+      const iconEl = btnRailTheme.querySelector('.rail-icon');
+      const labelEl = btnRailTheme.querySelector('.rail-label');
+      if (iconEl) iconEl.textContent = isNaver ? '🌙' : '☀️';
+      if (labelEl) labelEl.textContent = isNaver ? '다크테마' : '네이버톤';
+    }
+
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, isNaver ? 'naver' : 'dark');
+    } catch (_) {}
+  }
+
+  function toggleTheme() {
+    const isCurrentlyNaver = document.body.classList.contains('theme-naver');
+    applyTheme(isCurrentlyNaver ? 'dark' : 'naver');
+  }
+
+  function initTheme() {
+    let saved = 'naver';
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === 'naver' || stored === 'dark') {
+        saved = stored;
+      }
+    } catch (_) {}
+    applyTheme(saved);
+  }
+
+  function positionTutorialBoxes(step) {
+    const spotlight = document.getElementById('tutorial-spotlight');
+    const card = document.getElementById('tutorial-card');
+    if (!spotlight || !card) return;
+
+    const els = (step.targets || [])
+      .map((id) => document.getElementById(id))
+      .filter((el) => el && el.offsetParent !== null);
+
+    if (els.length === 0) return;
+
+    let top = Infinity;
+    let left = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+    els.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < top) top = r.top;
+      if (r.left < left) left = r.left;
+      if (r.right > right) right = r.right;
+      if (r.bottom > bottom) bottom = r.bottom;
+    });
+
+    if (step.panel === 'map') {
+      const dockEl = document.getElementById('naver-dock');
+      if (dockEl) {
+        const dockRect = dockEl.getBoundingClientRect();
+        if (dockRect.right > left && dockRect.right < right - 120) {
+          left = dockRect.right;
+        }
+      }
+    }
+
+    const pad = step.panel === 'map' ? -10 : 6;
+    const sTop = Math.max(4, top - pad);
+    const sLeft = Math.max(4, left - pad);
+    const sWidth = Math.min(window.innerWidth - sLeft - 4, right - left + pad * 2);
+    const sHeight = Math.min(window.innerHeight - sTop - 4, bottom - top + pad * 2);
+
+    spotlight.style.top = `${sTop}px`;
+    spotlight.style.left = `${sLeft}px`;
+    spotlight.style.width = `${Math.max(40, sWidth)}px`;
+    spotlight.style.height = `${Math.max(28, sHeight)}px`;
+
+    const cardRect = card.getBoundingClientRect();
+    const cardW = cardRect.width || 390;
+    const cardH = cardRect.height || 210;
+
+    let cTop = sTop + sHeight + 16;
+    let cLeft = sLeft;
+
+    if (step.panel === 'map') {
+      // 3단계에서도 이전 단계(2단계 [경로탐색] 버튼 하단)와 동일한 상단 위치에 설명 팝업을 유지하여 지도 중앙을 가리지 않음
+      const routeBtn = document.getElementById('btn-route-search');
+      if (routeBtn) {
+        const rb = routeBtn.getBoundingClientRect();
+        cTop = rb.bottom + 16;
+        cLeft = Math.max(14, Math.min(window.innerWidth - cardW - 14, rb.left));
+      } else {
+        cTop = Math.max(78, sTop + 56);
+        cLeft = sLeft + Math.max(12, (sWidth - cardW) / 2);
+      }
+    } else {
+      if (cLeft + cardW > window.innerWidth - 14) {
+        cLeft = Math.max(14, window.innerWidth - cardW - 14);
+      }
+      if (cTop + cardH > window.innerHeight - 14) {
+        cTop = Math.max(14, sTop - cardH - 16);
+      }
+    }
+
+    card.style.top = `${Math.round(cTop)}px`;
+    card.style.left = `${Math.round(cLeft)}px`;
+  }
+
+  function renderTutorialStep() {
+    if (!tutorialActive) return;
+    clearTutorialHighlights();
+
+    const step = TUTORIAL_STEPS[tutorialStepIdx];
+    if (!step) return;
+
+    if (step.panel === 'map') {
+      centerMapInWorkspace();
+    }
+
+    // 3단계 진입 시 지도를 약간 확대하여 출발-화점 선택 지점을 보기 쉽게 표시
+    if (step.zoomInMap && map) {
+      const baseZ = tutorialBaseZoom !== null ? tutorialBaseZoom : map.getZoom();
+      const targetZ = Math.min(18, Math.max(baseZ + 1, 16));
+      if (!tutorialZoomedIn) {
+        tutorialZoomedIn = true;
+        map.flyTo(map.getCenter(), targetZ, { duration: 0.55 });
+      }
+    } else if (!step.zoomInMap && tutorialZoomedIn && map && tutorialBaseZoom !== null) {
+      tutorialZoomedIn = false;
+      map.flyTo(map.getCenter(), tutorialBaseZoom, { duration: 0.45 });
+    }
+
+    // 지도 단계일 때 상단 안내 배너 미리보기 표시
+    const banner = document.getElementById('map-pick-banner');
+    if (banner) {
+      if (step.bannerPreview) {
+        banner.textContent = step.bannerPreview;
+        banner.classList.remove('hidden');
+      } else if (routeSelectStep === 'idle') {
+        banner.classList.add('hidden');
+      }
+    }
+
+    // 대상 요소 밝게 하이라이트
+    const targetEls = (step.targets || [])
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    targetEls.forEach((el) => el.classList.add('tutorial-target-active'));
+
+    // 카드 텍스트 및 단계 표시 업데이트
+    const isLastStep = tutorialStepIdx === TUTORIAL_STEPS.length - 1;
+    document.getElementById('tutorial-step-badge').textContent = `STEP ${tutorialStepIdx + 1} / ${TUTORIAL_STEPS.length}`;
+    document.getElementById('tutorial-step-title').textContent = step.title;
+    document.getElementById('tutorial-step-desc').innerHTML = step.desc;
+
+    const dotsWrap = document.getElementById('tutorial-step-dots');
+    if (dotsWrap) {
+      dotsWrap.innerHTML = '';
+      TUTORIAL_STEPS.forEach((_, idx) => {
+        const dot = document.createElement('span');
+        dot.className = 'tutorial-dot' + (idx === tutorialStepIdx ? ' active' : '');
+        dot.title = `${idx + 1}단계로 이동`;
+        dot.addEventListener('click', () => {
+          tutorialStepIdx = idx;
+          renderTutorialStep();
+        });
+        dotsWrap.appendChild(dot);
+      });
+    }
+
+    const prevBtn = document.getElementById('btn-tutorial-prev');
+    const skipBtn = document.getElementById('btn-tutorial-skip');
+    const nextBtn = document.getElementById('btn-tutorial-next');
+    if (prevBtn) prevBtn.disabled = tutorialStepIdx === 0;
+    if (skipBtn) skipBtn.classList.toggle('hidden', isLastStep);
+    if (nextBtn) {
+      nextBtn.textContent = isLastStep ? '안내화면 종료 ✕' : '다음 단계 ▶';
+    }
+
+    positionTutorialBoxes(step);
+    setTimeout(() => {
+      if (tutorialActive) positionTutorialBoxes(step);
+    }, 280);
+  }
+
   function bindEvents() {
     document.getElementById('region-select').addEventListener('change', (e) => {
       selectRegion(e.target.value, '');
     });
 
-    document.getElementById('village-select').addEventListener('change', (e) => {
-      selectVillage(e.target.value, true);
+    document.getElementById('village-select').addEventListener('change', async (e) => {
+      const val = e.target.value;
+      if (!val) {
+        selectVillage('', true);
+        return;
+      }
+      const vObj =
+        catalog && Array.isArray(catalog.villages)
+          ? catalog.villages.find((v) => v.id === val)
+          : null;
+      if (vObj && vObj.regionId && vObj.regionId !== currentRegionCode) {
+        document.getElementById('region-select').value = vObj.regionId;
+        await selectRegion(vObj.regionId, vObj.id);
+      } else {
+        selectVillage(val, true);
+      }
     });
 
     document.getElementById('vehicle-select').addEventListener('change', (e) => {
       currentThreshold = Number(e.target.value) || 2.2;
+      syncVehicleTabs(currentThreshold);
       refreshNetworkAndLayers();
+    });
+
+    document.querySelectorAll('.veh-tab[data-veh-width]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const w = Number(btn.dataset.vehWidth) || 2.2;
+        currentThreshold = w;
+        const sel = document.getElementById('vehicle-select');
+        if (sel) sel.value = String(w);
+        syncVehicleTabs(w);
+        refreshNetworkAndLayers();
+      });
+    });
+
+    document.querySelectorAll('#naver-rail .rail-tab[data-drawer-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-drawer-tab') || 'all';
+        switchDrawerTab(targetTab, true);
+      });
+    });
+
+    const btnShowAll = document.getElementById('btn-drawer-show-all');
+    if (btnShowAll) {
+      btnShowAll.addEventListener('click', () => {
+        switchDrawerTab('all', true);
+      });
+    }
+
+    ['btn-toggle-theme', 'btn-rail-theme'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          toggleTheme();
+        });
+      }
+    });
+
+    [
+      { id: 'link-nav-tmap', app: 'tmap' },
+      { id: 'link-nav-naver', app: 'naver' },
+      { id: 'link-nav-kakao', app: 'kakao' }
+    ].forEach(({ id, app }) => {
+      const navEl = document.getElementById(id);
+      if (navEl) {
+        navEl.addEventListener('click', (e) => {
+          const href = navEl.getAttribute('href') || '#';
+          if (href === '#') {
+            e.preventDefault();
+          }
+          openNavAppInfoPopup(app, href);
+        });
+      }
     });
 
     const btnRouteSearch = document.getElementById('btn-route-search');
     if (btnRouteSearch) {
       btnRouteSearch.addEventListener('click', () => {
+        centerMapInWorkspace();
         startRouteSearchFlow();
       });
     }
 
+    ['btn-how-to-use', 'btn-rail-how-to-use'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          startTutorial();
+        });
+      }
+    });
+
+    const btnTutPrev = document.getElementById('btn-tutorial-prev');
+    if (btnTutPrev) {
+      btnTutPrev.addEventListener('click', () => {
+        if (tutorialStepIdx > 0) {
+          tutorialStepIdx--;
+          renderTutorialStep();
+        }
+      });
+    }
+
+    const btnTutNext = document.getElementById('btn-tutorial-next');
+    if (btnTutNext) {
+      btnTutNext.addEventListener('click', () => {
+        if (tutorialStepIdx < TUTORIAL_STEPS.length - 1) {
+          tutorialStepIdx++;
+          renderTutorialStep();
+        } else {
+          closeTutorial();
+        }
+      });
+    }
+
+    ['btn-tutorial-close', 'btn-tutorial-skip'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          closeTutorial();
+        });
+      }
+    });
+
     document.getElementById('btn-pick-start').addEventListener('click', () => {
+      centerMapInWorkspace();
       startRouteSearchFlow();
     });
+
+    const btnToggleLeft = document.getElementById('btn-toggle-left-panel');
+    if (btnToggleLeft) {
+      btnToggleLeft.addEventListener('click', () => {
+        const leftPanel = document.getElementById('left-panel');
+        if (!leftPanel) return;
+        const willCollapse = !leftPanel.classList.contains('collapsed');
+        setDrawerCollapsed(willCollapse);
+      });
+    }
+
+    const btnToggleRight = document.getElementById('btn-toggle-right-panel');
+    if (btnToggleRight) {
+      btnToggleRight.addEventListener('click', () => {
+        const rightPanel = document.getElementById('right-panel');
+        if (!rightPanel) return;
+        if (rightPanel.classList.contains('tab-hidden')) {
+          switchDrawerTab('all', true);
+          rightPanel.classList.remove('collapsed');
+          btnToggleRight.textContent = '브리핑 접기';
+          return;
+        }
+        const collapsed = rightPanel.classList.toggle('collapsed');
+        btnToggleRight.textContent = collapsed ? '브리핑 펼치기' : '브리핑 접기';
+        refreshMapSizeAfterPanelChange();
+      });
+    }
 
     const btnStation = document.getElementById('btn-station-start');
     if (btnStation) {
@@ -4072,6 +6068,22 @@ body.pick-start-mode #map {
     }
 
     document.addEventListener('keydown', (e) => {
+      if (tutorialActive) {
+        if (e.key === 'Escape') {
+          closeTutorial();
+        } else if (e.key === 'ArrowRight') {
+          if (tutorialStepIdx < TUTORIAL_STEPS.length - 1) {
+            tutorialStepIdx++;
+            renderTutorialStep();
+          }
+        } else if (e.key === 'ArrowLeft') {
+          if (tutorialStepIdx > 0) {
+            tutorialStepIdx--;
+            renderTutorialStep();
+          }
+        }
+        return;
+      }
       if (e.key === 'Escape' && routeSelectStep !== 'idle') {
         setRouteSelectStep('idle');
       }
@@ -4105,12 +6117,42 @@ body.pick-start-mode #map {
     ['chk-diag-raw', 'chk-diag-sat', 'chk-diag-splits'].forEach((id) => {
       document.getElementById(id).addEventListener('change', renderDiagLayers);
     });
+
+    window.addEventListener('resize', () => {
+      refreshMapSizeAfterPanelChange();
+      if (tutorialActive && TUTORIAL_STEPS[tutorialStepIdx]) {
+        positionTutorialBoxes(TUTORIAL_STEPS[tutorialStepIdx]);
+      }
+    });
+  }
+
+  function refreshMapSizeAfterPanelChange() {
+    if (map) map.invalidateSize();
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 280);
+  }
+
+  function centerMapInWorkspace() {
+    const workspace = document.querySelector('.workspace');
+    const mapContainer = document.getElementById('map-container');
+    if (!workspace || !mapContainer) return;
+    if (workspace.scrollWidth > workspace.clientWidth + 8) {
+      const targetLeft =
+        mapContainer.offsetLeft - Math.max(0, (workspace.clientWidth - mapContainer.offsetWidth) / 2);
+      workspace.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initMap();
     bindEvents();
+    switchDrawerTab('all', false);
     loadCatalog();
+    setTimeout(() => {
+      centerMapInWorkspace();
+    }, 120);
   });
 })();
 
