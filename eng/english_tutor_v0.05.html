@@ -1,0 +1,5479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Article Tutor v0.05 — 4단계 영어 기사 학습 튜터 (Mobile Adaptive)</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-light: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --accent: #0ea5e9;
+      --success: #10b981;
+      --success-soft: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-soft: #fffbeb;
+      --danger: #ef4444;
+      --danger-soft: #fef2f2;
+      --purple: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --highlight-key: #fef9c3;
+      --highlight-pos: #dcfce7;
+      --highlight-neg: #fee2e2;
+      --highlight-guess: #e0e7ff;
+      --highlight-chunk: #d1fae5;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.14);
+      --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Routine Banner */
+    .routine-banner {
+      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+      color: #f8fafc;
+      padding: 8px 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .routine-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .day-badge {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+    }
+
+    .day-switcher {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .day-switcher button {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .day-switcher button.active {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Main Header */
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .brand-version {
+      font-size: 0.75rem;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .timer-display {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text);
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .timer-display.warning {
+      color: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    .timer-progress-wrap {
+      width: 60px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .timer-progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 100%;
+      transition: width 0.5s linear;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--surface-alt);
+      border-color: var(--border-strong);
+    }
+
+    .btn-sm {
+      padding: 4px 9px;
+      font-size: 0.78rem;
+    }
+
+    .btn-xs {
+      padding: 2px 7px;
+      font-size: 0.73rem;
+      border-radius: 4px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      border-color: var(--success);
+    }
+
+    .btn-success:hover {
+      background: #059669;
+      border-color: #059669;
+    }
+
+    .btn-purple {
+      background: var(--purple);
+      color: #fff;
+      border-color: var(--purple);
+    }
+
+    .btn-purple:hover {
+      background: #6d28d9;
+      border-color: #6d28d9;
+    }
+
+    .btn-ai-status {
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-ai-status.connected {
+      background: var(--success-soft);
+      border-color: var(--success);
+      color: #065f46;
+    }
+
+    /* URL Input Bar */
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .url-input-group {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      align-items: center;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px 4px 2px 12px;
+      transition: border-color 0.15s;
+    }
+
+    .url-input-group:focus-within {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .url-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 7px 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .sample-select {
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* 4-Step Cycle Stepper */
+    .cycle-stepper {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .step-tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      color: var(--text-muted);
+    }
+
+    .step-tab:hover {
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+
+    .step-tab.active {
+      border-bottom-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .step-tab.active .step-num {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .step-info {
+      overflow: hidden;
+    }
+
+    .step-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Workspace Layout */
+    .workspace {
+      flex: 1;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .cycle-stepper {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Left Column: Article Reader Panel */
+    .reader-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .mode-toolbar {
+      background: var(--primary-soft);
+      border-bottom: 1px solid #dbeafe;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mode-guide-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mode-guide-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #1e40af;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-guide-sub {
+      font-size: 0.82rem;
+      color: #3b82f6;
+    }
+
+    .mode-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: #dbeafe;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      gap: 2px;
+    }
+
+    .segmented-control button {
+      border: none;
+      background: transparent;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1e40af;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .segmented-control button.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      cursor: pointer;
+    }
+
+    .lock-badge.unlocked {
+      background: var(--surface);
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+
+    /* Article Content Area */
+    .article-container {
+      padding: 32px 40px;
+    }
+
+    @media (max-width: 640px) {
+      .article-container {
+        padding: 20px;
+      }
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-pill {
+      background: var(--surface-alt);
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    .article-headline {
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
+      line-height: 1.3;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 22px;
+      padding: 8px 12px;
+      border-left: 4px solid var(--primary);
+      background: linear-gradient(90deg, var(--primary-soft) 0%, transparent 100%);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .article-body {
+      font-family: var(--font-serif);
+      font-size: 1.14rem;
+      line-height: 1.88;
+      color: #1e293b;
+    }
+
+    .article-body.font-sans {
+      font-family: var(--font-sans);
+    }
+
+    .article-subheading {
+      font-family: var(--font-sans);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 28px 0 12px 0;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .article-paragraph {
+      margin-bottom: 18px;
+      position: relative;
+      transition: opacity 0.2s ease;
+    }
+
+    .skim-badge {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 1px 7px;
+      border-radius: 4px;
+      margin-right: 6px;
+      vertical-align: middle;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Skimming Visual States */
+    .sentence-span {
+      transition: all 0.16s ease;
+      border-radius: 4px;
+      padding: 2px 1px;
+      position: relative;
+    }
+
+    .sentence-span.active-grammar-sentence {
+      background-color: #ede9fe !important;
+      box-shadow: 0 0 0 2px #c4b5fd;
+    }
+
+    .sentence-grammar-btn {
+      display: none;
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      margin-left: 4px;
+      border-radius: 4px;
+      border: 1px solid #c4b5fd;
+      background: #f5f3ff;
+      color: #6d28d9;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .step-2-active .sentence-span:hover {
+      background-color: #f1f5f9;
+    }
+
+    .step-2-active .sentence-span:hover .sentence-grammar-btn {
+      display: inline-block;
+    }
+
+    .skim-mode-dim .sentence-span.skim-key {
+      background-color: var(--highlight-key);
+      box-shadow: 0 0 0 2px var(--highlight-key);
+      color: #0f172a;
+      font-weight: 500;
+    }
+
+    .skim-mode-dim .sentence-span.skim-rest {
+      opacity: 0.26;
+      filter: blur(0.4px);
+    }
+
+    .skim-mode-dim .sentence-span.skim-rest:hover {
+      opacity: 0.88;
+      filter: none;
+    }
+
+    .skim-mode-only .sentence-span.skim-rest {
+      display: none;
+    }
+
+    .skim-mode-only .article-paragraph.non-key-para {
+      display: none;
+    }
+
+    .skim-mode-only .sentence-span.skim-key {
+      background-color: var(--highlight-key);
+    }
+
+    /* Context Guess & Saved Chunk Highlights */
+    .context-mark {
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .context-mark.pos {
+      background: var(--highlight-pos);
+      border-bottom-color: #16a34a;
+    }
+
+    .context-mark.neg {
+      background: var(--highlight-neg);
+      border-bottom-color: #dc2626;
+    }
+
+    .context-mark.guess {
+      background: var(--highlight-guess);
+      border-bottom-color: #4f46e5;
+    }
+
+    .chunk-mark {
+      background: var(--highlight-chunk);
+      border-bottom: 2px solid #059669;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Right Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 90px;
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .side-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .side-card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .side-card-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Step 2 Sub-tabs in Sidebar */
+    .sidebar-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .sidebar-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 7px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .sidebar-tab-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Dictionary Panel Styles */
+    .dict-search-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .dict-result-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: var(--surface-alt);
+      margin-bottom: 12px;
+    }
+
+    .dict-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dict-query-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .dict-phonetic {
+      font-size: 0.84rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .dict-ko-meaning {
+      background: var(--primary-soft);
+      border-left: 3px solid var(--primary);
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 10px;
+    }
+
+    .chunk-coach-banner {
+      background: var(--warning-soft);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
+      font-size: 0.79rem;
+      color: #92400e;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .dict-pos-block {
+      margin-top: 10px;
+    }
+
+    .dict-pos-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #334155;
+      margin-bottom: 5px;
+    }
+
+    .dict-def-list {
+      padding-left: 16px;
+      font-size: 0.82rem;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .dict-example {
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      margin-top: 2px;
+    }
+
+    .word-chip-bar {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .word-chip {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .word-chip.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Chunk Box Styles */
+    .chunk-meter-wrap {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+    }
+
+    .chunk-meter-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .chunk-meter-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .chunk-meter-fill {
+      height: 100%;
+      background: var(--success);
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .chunk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chunk-card {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--success);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chunk-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .chunk-expr {
+      font-weight: 800;
+      font-size: 0.94rem;
+      color: #065f46;
+    }
+
+    .chunk-meaning {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .chunk-sentence {
+      font-size: 0.77rem;
+      color: var(--text-muted);
+      background: var(--surface-alt);
+      padding: 6px 8px;
+      border-radius: 4px;
+      line-height: 1.45;
+    }
+
+    /* Grammar Analysis Panel Styles */
+    .grammar-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: var(--surface-alt);
+    }
+
+    .grammar-target-sentence {
+      font-family: var(--font-serif);
+      font-size: 0.98rem;
+      line-height: 1.75;
+      background: var(--surface);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .gram-s {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+      border-bottom: 2px solid #2563eb;
+    }
+
+    .gram-v {
+      background: #fce7f3;
+      color: #9d174d;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+      border-bottom: 2px solid #db2777;
+    }
+
+    .gram-conn {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .grammar-component-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .grammar-component-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 0.81rem;
+    }
+
+    .grammar-role-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    /* Step 3: Breath Slash, S/V Inline & TTS Active Sentence */
+    .breath-slash {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 0 5px;
+      margin: 0 3px;
+      border-radius: 4px;
+      font-size: 0.86em;
+      user-select: none;
+    }
+
+    .sentence-span.tts-playing {
+      background-color: #fef08a !important;
+      box-shadow: 0 0 0 3px #fde047;
+      color: #0f172a;
+      border-radius: 4px;
+    }
+
+    .sentence-tts-btn {
+      display: none;
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      margin-left: 4px;
+      border-radius: 4px;
+      border: 1px solid #bae6fd;
+      background: #f0f9ff;
+      color: #0369a1;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .step-3-active .sentence-span:hover {
+      background-color: #f0f9ff;
+    }
+
+    .step-3-active .sentence-span:hover .sentence-tts-btn {
+      display: inline-block;
+    }
+
+    /* Step 4: Article Cover Blur & Chunk Usage Chips */
+    .article-covered-blur {
+      filter: blur(11px);
+      opacity: 0.22;
+      pointer-events: none;
+      user-select: none;
+      transition: all 0.25s ease;
+    }
+
+    .article-cover-banner {
+      display: none;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: #fff;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      margin-bottom: 18px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .article-cover-banner.active {
+      display: flex;
+    }
+
+    .chunk-usage-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-size: 0.81rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chunk-usage-chip.used {
+      background: var(--success-soft);
+      border-color: var(--success);
+      color: #065f46;
+    }
+
+    .flashcard-hidden-expr {
+      filter: blur(6px);
+      background: #cbd5e1;
+      border-radius: 4px;
+      padding: 0 4px;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+
+    .flashcard-hidden-expr:hover {
+      filter: none;
+      background: transparent;
+    }
+
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--text);
+      background: var(--surface-alt);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .checklist input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .textarea-box {
+      width: 100%;
+      min-height: 76px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .textarea-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .guess-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .guess-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 0.83rem;
+      background: var(--surface-alt);
+    }
+
+    .guess-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .guess-word {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .guess-note {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .tag-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .tag-pill.pos { background: var(--highlight-pos); color: #166534; }
+    .tag-pill.neg { background: var(--highlight-neg); color: #991b1b; }
+    .tag-pill.guess { background: var(--highlight-guess); color: #3730a3; }
+    .tag-pill.chunk { background: var(--highlight-chunk); color: #065f46; }
+
+    /* Floating Selection Popover */
+    .selection-popover {
+      position: fixed;
+      z-index: 200;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 280px;
+      max-width: 360px;
+    }
+
+    .selection-popover.visible {
+      display: flex;
+    }
+
+    .popover-header {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .popover-selected-text {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 0.92rem;
+      word-break: break-word;
+    }
+
+    .popover-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .popover-btn {
+      flex: 1;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 6px 9px;
+      border-radius: 5px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .popover-btn:hover {
+      background: rgba(255,255,255,0.22);
+    }
+
+    .popover-btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .popover-btn.success {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .popover-input {
+      width: 100%;
+      padding: 5px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(15, 23, 42, 0.8);
+      color: #fff;
+      font-size: 0.78rem;
+      outline: none;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      max-width: 560px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-family: var(--font-sans);
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    /* Toast notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .loading-overlay {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modal Responsive Grids */
+    .domain-form-grid-1 {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .domain-form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .review-modal-grid {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding-right: 4px;
+    }
+
+    /* Mobile Floating Quick Navigation (Article <-> Learning Sidebar) */
+    .mobile-quick-nav {
+      display: none;
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      z-index: 180;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 5px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      gap: 4px;
+    }
+
+    .mobile-quick-nav button {
+      border: none;
+      background: transparent;
+      color: #f8fafc;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 6px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .mobile-quick-nav button.primary-jump {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Touch Device Enhancements (No Hover Required) */
+    @media (hover: none), (pointer: coarse), (max-width: 768px) {
+      .step-2-active .sentence-span .sentence-grammar-btn {
+        display: inline-block;
+        padding: 2px 7px;
+        font-size: 0.71rem;
+        margin-left: 5px;
+      }
+      .step-3-active .sentence-span .sentence-tts-btn {
+        display: inline-block;
+        padding: 2px 7px;
+        font-size: 0.71rem;
+        margin-left: 5px;
+      }
+      .skim-mode-dim .sentence-span.skim-rest {
+        opacity: 0.38;
+        filter: none;
+      }
+    }
+
+    /* Tablet & 1-Column Breakpoint */
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+        padding: 14px 16px;
+        gap: 18px;
+      }
+      .sidebar {
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
+      }
+      .mobile-quick-nav {
+        display: flex;
+      }
+    }
+
+    /* Mobile Smartphone Breakpoint (360px ~ 768px) */
+    @media (max-width: 768px) {
+      .routine-banner {
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        gap: 6px;
+      }
+      .day-switcher {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .day-switcher button {
+        flex: 1;
+        text-align: center;
+        padding: 4px 4px;
+      }
+      /* Unstick multi-row header on phones so it doesn't eat 40% of screen height */
+      .app-header {
+        position: static;
+        padding: 10px 12px;
+      }
+      .header-top {
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .brand-title {
+        font-size: 1.02rem;
+      }
+      .header-controls {
+        width: 100%;
+        gap: 6px;
+        justify-content: space-between;
+      }
+      .timer-widget {
+        width: 100%;
+        justify-content: space-between;
+        padding: 5px 10px;
+      }
+      .url-bar {
+        gap: 6px;
+      }
+      .url-input-group {
+        min-width: 100%;
+      }
+      .url-bar > .btn {
+        flex: 1 1 auto;
+        padding: 8px 8px;
+        font-size: 0.78rem;
+      }
+      /* Make the 4-Step Stepper compact and sticky at the top on mobile */
+      .cycle-stepper {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        padding: 0 6px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
+        box-shadow: var(--shadow-sm);
+      }
+      .step-tab {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 3px;
+        gap: 3px;
+      }
+      .step-num {
+        width: 22px;
+        height: 22px;
+        font-size: 0.74rem;
+      }
+      .step-title {
+        font-size: 0.72rem;
+      }
+      .step-desc {
+        display: none;
+      }
+      .workspace {
+        padding: 10px 10px 72px 10px;
+        gap: 14px;
+      }
+      .mode-toolbar {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .mode-guide-title {
+        font-size: 0.88rem;
+      }
+      .mode-guide-sub {
+        font-size: 0.77rem;
+      }
+      .mode-controls {
+        width: 100%;
+      }
+      .segmented-control {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      .segmented-control button {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 6px 6px;
+        font-size: 0.75rem;
+      }
+      .article-container {
+        padding: 16px 14px;
+      }
+      .article-meta {
+        gap: 6px;
+        font-size: 0.76rem;
+      }
+      .article-headline {
+        font-size: 1.32rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+        padding: 6px 10px;
+      }
+      .article-body {
+        font-size: 1.02rem;
+        line-height: 1.78;
+      }
+      .article-subheading {
+        font-size: 1.06rem;
+        margin: 20px 0 10px 0;
+      }
+      .side-card {
+        padding: 14px;
+      }
+      .sidebar-tab-btn {
+        font-size: 0.75rem;
+        padding: 7px 4px;
+      }
+      /* Dock Selection Popover as a Bottom Action Sheet on Mobile */
+      .selection-popover {
+        left: 8px !important;
+        right: 8px !important;
+        bottom: 10px !important;
+        top: auto !important;
+        min-width: 0;
+        max-width: none;
+        width: auto;
+        border-radius: var(--radius-lg);
+        padding: 14px;
+        z-index: 350;
+        box-shadow: 0 -4px 25px rgba(15, 23, 42, 0.32);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+      .popover-btn {
+        padding: 9px 8px;
+        font-size: 0.8rem;
+      }
+      .popover-input {
+        padding: 8px 10px;
+        font-size: 0.84rem;
+      }
+      /* Modals on Mobile */
+      .modal-backdrop {
+        padding: 8px;
+      }
+      .modal-card {
+        padding: 16px 14px;
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+      .domain-form-grid-1,
+      .domain-form-grid-2,
+      .review-modal-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .toast-container {
+        left: 12px;
+        right: 12px;
+        bottom: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Weekly Routine Banner -->
+  <div class="routine-banner">
+    <div class="routine-banner-left">
+      <span class="day-badge" id="routineDayBadge">월~목 루틴</span>
+      <span id="routineGuideText"><strong>15분 집중 사이클:</strong> 기사 1편 읽기(스키밍) + 핵심 표현(Chunk) 3~5개 수집 + 영어 1문장 요약</span>
+    </div>
+    <div class="day-switcher" title="요일별 루틴 가이드 미리보기">
+      <button type="button" data-routine="weekday" class="active" onclick="setRoutineBanner('weekday')">월~목 (15분 루틴)</button>
+      <button type="button" data-routine="friday" onclick="setRoutineBanner('friday')">금요일 (청크 복습)</button>
+      <button type="button" data-routine="weekend" onclick="setRoutineBanner('weekend')">주말 (휴식/리스닝)</button>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-logo">E</div>
+        <div>
+          <span class="brand-title">English Article Tutor</span>
+          <span class="brand-version">v0.05 · Mobile & Touch Adaptive</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- 15-Minute Routine Timer -->
+        <div class="timer-widget" id="timerWidget" title="기사 하나에 15~20분 이상 쓰지 마세요 (지치지 않는 루틴)">
+          <span style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">⏱ 15분 루틴</span>
+          <span class="timer-display" id="timerDisplay">15:00</span>
+          <div class="timer-progress-wrap">
+            <div class="timer-progress-bar" id="timerProgressBar"></div>
+          </div>
+          <button class="btn btn-sm" id="timerStartBtn" onclick="toggleTimer()">시작</button>
+          <button class="btn btn-sm" onclick="resetTimer()">리셋</button>
+        </div>
+
+        <!-- Weekly Review Notebook Button (Friday Routine) -->
+        <button class="btn btn-sm" onclick="openReviewModal()" title="주중에 모아둔 표현(Chunk)과 1문장 요약을 복습하고 새 문장을 만들어 봅니다">
+          📒 주간 복습장 (<span id="headerArchiveCount">0</span>)
+        </button>
+
+        <!-- Font Toggle -->
+        <button class="btn btn-sm" onclick="toggleReaderFont()" id="fontToggleBtn" title="본문 폰트 변경 (세리프/산세리프)">Aa 세리프</button>
+
+        <!-- AI Hybrid Config Button -->
+        <button class="btn btn-ai-status" id="aiStatusBtn" onclick="openModal('aiModal')">
+          <span id="aiStatusDot">⚪</span>
+          <span id="aiStatusText">AI 설정 (기본 무료 모드)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- URL Input & Extraction Bar (Sample selector removed, Domain Element Rule config added) -->
+    <div class="url-bar">
+      <div class="url-input-group">
+        <span style="color:var(--text-light); font-size:0.9rem;">🔗</span>
+        <input
+          type="url"
+          id="articleUrlInput"
+          class="url-input"
+          placeholder="영어 뉴스 기사 URL을 입력하세요 (도메인별 지정 Element 자동 인식)"
+          oninput="previewMatchedDomainRule(this.value)"
+          onkeydown="if(event.key==='Enter') extractArticleFromUrl()"
+        />
+        <span id="matchedDomainBadge" class="tag-pill chunk" style="display:none; margin-right:6px; font-size:0.72rem;"></span>
+      </div>
+      <button class="btn btn-primary" onclick="extractArticleFromUrl()" id="extractBtn">기사 추출</button>
+      <button class="btn" onclick="openDomainRulesModal()" id="domainRuleBtn" title="특정 사이트(도메인)별로 본문을 추출할 HTML Element(CSS 선택자)를 지정합니다">
+        🎯 도메인별 추출 Element 설정 (<span id="domainRuleCount">0</span>)
+      </button>
+      <button class="btn" onclick="openModal('pasteModal')">📋 직접 붙여넣기</button>
+    </div>
+  </header>
+
+  <!-- 4-Step Learning Cycle Stepper -->
+  <nav class="cycle-stepper" aria-label="4단계 학습 사이클">
+    <button class="step-tab active" data-step="1" onclick="switchStep(1)">
+      <span class="step-num">1</span>
+      <div class="step-info">
+        <div class="step-title">① 1독: Skimming</div>
+        <div class="step-desc">사전 없이 핵심 문장·논리 흐름 파악</div>
+      </div>
+    </button>
+    <button class="step-tab" data-step="2" onclick="switchStep(2)">
+      <span class="step-num">2</span>
+      <div class="step-info">
+        <div class="step-title">② 2독: Scanning & Mining</div>
+        <div class="step-desc">사전 연동 · 청크 3~5개 수집 · 문법 분석</div>
+      </div>
+    </button>
+    <button class="step-tab" data-step="3" onclick="switchStep(3)">
+      <span class="step-num">3</span>
+      <div class="step-info">
+        <div class="step-title">③ 3독: Shadowing</div>
+        <div class="step-desc">의미 덩어리 끊어 읽기 · 소리 내어 읽기</div>
+      </div>
+    </button>
+    <button class="step-tab" data-step="4" onclick="switchStep(4)">
+      <span class="step-num">4</span>
+      <div class="step-info">
+        <div class="step-title">④ 1문장 요약: Retrieval</div>
+        <div class="step-desc">기사 가리고 수집한 표현 넣어 1문장 요약</div>
+      </div>
+    </button>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="workspace">
+    <!-- Left Column: Article Reader -->
+    <section class="reader-card">
+      <!-- Dynamic Mode Toolbar -->
+      <div class="mode-toolbar" id="modeToolbar">
+        <div class="mode-guide-text">
+          <div class="mode-guide-title" id="modeGuideTitle">
+            <span>① 1독(Skimming) 모드</span>
+          </div>
+          <div class="mode-guide-sub" id="modeGuideSub">
+            헤드라인, 첫 1~2문단, 각 소제목 첫 문장만 먼저 읽으며 핵심(Main Idea)을 잡으세요. 모르는 단어는 문맥(긍정/부정)으로 추측합니다.
+          </div>
+        </div>
+
+        <!-- Step 1 Controls -->
+        <div class="mode-controls" id="step1Controls">
+          <div class="segmented-control" title="스키밍 하이라이트 보기 방식">
+            <button type="button" data-skim="dim" class="active" onclick="setSkimView('dim')">핵심 강조 (나머지 흐리게)</button>
+            <button type="button" data-skim="only" onclick="setSkimView('only')">핵심 문장만 모아보기</button>
+            <button type="button" data-skim="full" onclick="setSkimView('full')">전체 선명히 보기</button>
+          </div>
+
+          <button type="button" class="lock-badge" id="dictLockBtn" onclick="toggleDictLock()" title="1독에서는 사전을 찾지 않고 문맥으로 추측하는 것을 권장합니다">
+            🔒 사전 잠금 (문맥 추측 ON)
+          </button>
+        </div>
+
+        <!-- Step 2 Controls -->
+        <div class="mode-controls" id="step2Controls" style="display:none;">
+          <span class="tag-pill chunk" id="toolbarChunkBadge">📦 수집한 청크: 0 / 5 (권장 3~5개)</span>
+          <span style="font-size:0.78rem; color:#1e40af; font-weight:600;">
+            💡 본문 단어/구문을 드래그하면 사전 조회·청크 저장·문법 분석이 실행됩니다
+          </span>
+        </div>
+
+        <!-- Step 3 Controls (Shadowing & Breath Slash & TTS) -->
+        <div class="mode-controls" id="step3Controls" style="display:none;">
+          <button type="button" class="btn btn-sm btn-primary" id="step3SlashBtn" onclick="toggleStep3Slash()">
+            ✂️ 의미 단위 끊어 읽기( / ) ON
+          </button>
+          <button type="button" class="btn btn-sm" id="step3SVBtn" onclick="toggleStep3SV()">
+            🎯 주어[S]·본동사[V] 표시 OFF
+          </button>
+          <div class="segmented-control" title="TTS 읽기 속도">
+            <button type="button" data-rate="0.8" onclick="setTtsRate(0.8)">0.8x</button>
+            <button type="button" data-rate="0.95" class="active" onclick="setTtsRate(0.95)">0.95x</button>
+            <button type="button" data-rate="1.1" onclick="setTtsRate(1.1)">1.1x</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-success" id="ttsPlayAllBtn" onclick="playArticleTts()">▶ 전체 읽기</button>
+          <button type="button" class="btn btn-sm" onclick="stopArticleTts()">⏹ 정지</button>
+        </div>
+
+        <!-- Step 4 Controls (1-Sentence Summary & Cover Article) -->
+        <div class="mode-controls" id="step4Controls" style="display:none;">
+          <button type="button" class="btn btn-sm btn-primary" id="toggleCoverBtn" onclick="toggleArticleCover()">
+            🙈 본문 가리기 중 (클릭 시 해제)
+          </button>
+          <button type="button" class="btn btn-sm" onclick="peekArticle5Seconds()">
+            👁️ 5초간 힌트 보기
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <span id="loadingText">기사 본문을 추출하고 문장 구조를 분석하는 중입니다...</span>
+      </div>
+
+      <!-- Article Reader Content -->
+      <article class="article-container" id="articleContainer">
+        <div class="article-meta" id="articleMeta">
+          <span class="meta-pill" id="metaSource">URL 입력 대기 중</span>
+          <span class="meta-pill" id="metaExtractorRule" style="display:none; background:#dcfce7; color:#166534;"></span>
+          <span class="meta-pill" id="metaWordCount">0 words</span>
+          <span class="meta-pill" id="metaSkimTime">스키밍 약 0분</span>
+          <button type="button" class="btn btn-xs" id="clearArticleBtn" style="margin-left:auto; display:none;" onclick="clearCurrentArticle()">🗑️ 본문 비우기</button>
+        </div>
+
+        <!-- Step 4 Cover Banner -->
+        <div class="article-cover-banner" id="articleCoverBanner">
+          <div>
+            <div style="font-weight:800; font-size:0.95rem;">🙈 4단계 인출(Retrieval) 모드 — 기사를 덮고 영어 1문장으로 요약해 보세요!</div>
+            <div style="font-size:0.8rem; color:#cbd5e1;">본문을 보지 않고 2독에서 수집한 청크(3~5개) 중 최소 1개를 사용해 문장을 만들 때 장기 기억으로 전환됩니다.</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-sm" onclick="peekArticle5Seconds()">👁️ 5초 힌트 보기</button>
+            <button type="button" class="btn btn-sm" onclick="toggleArticleCover()">본문 다시 펼치기</button>
+          </div>
+        </div>
+
+        <h1 class="article-headline" id="articleHeadline">영어 기사 URL을 입력하여 학습을 시작하세요</h1>
+        <div class="article-body skim-mode-dim" id="articleBody"></div>
+      </article>
+    </section>
+
+    <!-- Right Column: Step Learning Sidebar -->
+    <aside class="sidebar" id="learningSidebar">
+      <!-- ==================== STEP 1 SIDEBAR ==================== -->
+      <div class="side-card" id="sidebarStep1">
+        <div class="side-card-title">
+          <span>🧭 1독(Skimming) 학습 가이드</span>
+          <span class="tag-pill guess" id="skimSentenceRatio">핵심 문장 0/0</span>
+        </div>
+        <p class="side-card-desc">
+          사전 없이 핵심 문장(노란색 하이라이트)을 중심으로 빠르게 읽으며 아래 3가지를 체크해 보세요.
+        </p>
+
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="chkHeadline" />
+            <label for="chkHeadline"><strong>헤드라인 & 첫 1~2문단</strong>을 읽고 기사의 중심 화제를 파악했나요?</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chkSubheadings" />
+            <label for="chkSubheadings"><strong>각 소제목과 첫 문장</strong>만 연결해 읽으며 글의 논리 전개를 파악했나요?</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chkContextGuess" />
+            <label for="chkContextGuess">모르는 단어를 사전 없이 <strong>긍정(+)/부정(-) 문맥</strong>으로 추측하며 읽었나요?</label>
+          </li>
+        </ul>
+
+        <label class="form-label" for="mainIdeaInput">💡 1독 후 파악한 핵심 요지 (Main Idea 메모)</label>
+        <textarea
+          id="mainIdeaInput"
+          class="textarea-box"
+          placeholder="기자가 이 기사를 통해 말하고자 하는 핵심 흐름을 한국어나 키워드로 가볍게 적어보세요."
+          oninput="saveCurrentArticleState()"
+        ></textarea>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 12px 0 8px 0;">
+          <span class="form-label" style="margin:0;">🔍 문맥으로 추측한 단어/표현 (<span id="guessCount">0</span>)</span>
+          <span style="font-size:0.74rem; color:var(--text-muted);">본문 드래그로 추가</span>
+        </div>
+        <div class="guess-list" id="guessList"></div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:14px; padding:10px;" onclick="switchStep(2)">
+          1독 완료 → ② 2독(청크 수집 & 사전)으로 이동
+        </button>
+      </div>
+
+      <!-- ==================== STEP 2 SIDEBAR ==================== -->
+      <div class="side-card" id="sidebarStep2" style="display:none;">
+        <div class="side-card-title">
+          <span>⛏️ 2독(Scanning & Mining) 워크스테이션</span>
+          <span class="tag-pill chunk" id="step2ChunkCountBadge">0 / 5개</span>
+        </div>
+
+        <!-- 3 Sub-tabs: Dictionary / Chunks / Grammar -->
+        <div class="sidebar-tabs">
+          <button type="button" class="sidebar-tab-btn active" data-s2tab="dict" onclick="switchStep2SubTab('dict')">
+            📖 사전 · 청크추가
+          </button>
+          <button type="button" class="sidebar-tab-btn" data-s2tab="chunks" onclick="switchStep2SubTab('chunks')">
+            📦 수집함 (<span id="tabChunkNum">0</span>)
+          </button>
+          <button type="button" class="sidebar-tab-btn" data-s2tab="grammar" onclick="switchStep2SubTab('grammar')">
+            🔬 문법 구조 분석
+          </button>
+        </div>
+
+        <!-- SUB-TAB 1: Integrated Dictionary & Quick Chunk Save -->
+        <div id="s2PaneDict">
+          <div class="dict-search-bar">
+            <input
+              type="text"
+              id="dictSearchInput"
+              class="form-control"
+              placeholder="단어나 구문(Chunk) 입력 또는 본문 드래그..."
+              onkeydown="if(event.key==='Enter') lookupDictionary(this.value)"
+            />
+            <button class="btn btn-primary btn-sm" onclick="lookupDictionary(document.getElementById('dictSearchInput').value)">조회</button>
+          </div>
+
+          <!-- Context Guesses Quick Verification Bar (if user made guesses in Step 1) -->
+          <div id="step1GuessVerifyBar" style="display:none; margin-bottom:12px;">
+            <div style="font-size:0.76rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">
+              🔍 1독 때 추측한 단어 실제 뜻 확인하기:
+            </div>
+            <div class="word-chip-bar" id="step1GuessChips"></div>
+          </div>
+
+          <!-- Dictionary Result Container -->
+          <div id="dictResultContainer">
+            <div class="dict-result-box" style="text-align:center; color:var(--text-muted); font-size:0.83rem; padding:24px 12px;">
+              본문에서 모르는 <strong>단어</strong>나 써먹고 싶은 <strong>구문(동사구·전치사구·연어)</strong>을 마우스로 드래그하면<br/>
+              <strong>한국어 뜻 + 영영 사전 정의 + 발음</strong>이 여기에 표시됩니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 2: Chunk Collection Box (Target 3~5 Chunks) -->
+        <div id="s2PaneChunks" style="display:none;">
+          <div class="chunk-meter-wrap">
+            <div class="chunk-meter-top">
+              <span id="chunkGoalStatusText">🎯 목표: 핵심 표현(Chunk) 3~5개 수집</span>
+              <span id="chunkGoalCountText">0 / 5</span>
+            </div>
+            <div class="chunk-meter-bar">
+              <div class="chunk-meter-fill" id="chunkMeterFill"></div>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">
+              단어 하나(✕ <code>impose</code>)가 아니라 동사구·전치사구·연어(⭕ <code>impose strict regulations on AI platforms</code>) 단위로 골라 정리하세요.
+            </div>
+          </div>
+
+          <!-- Manual Chunk Add Form -->
+          <div style="background:var(--surface-alt); border:1px solid var(--border); padding:10px; border-radius:var(--radius-sm); margin-bottom:12px;">
+            <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px;">➕ 직접 표현(Chunk) 추가</div>
+            <input type="text" id="manualChunkExpr" class="form-control" style="margin-bottom:6px; padding:6px 9px; font-size:0.82rem;" placeholder="영어 청크 (예: impose strict regulations on ~)" />
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="manualChunkMean" class="form-control" style="padding:6px 9px; font-size:0.82rem;" placeholder="한국어 뜻 (비워두면 자동 번역)" />
+              <button class="btn btn-success btn-sm" onclick="addChunkManually()">저장</button>
+            </div>
+          </div>
+
+          <div class="chunk-list" id="chunkListContainer"></div>
+        </div>
+
+        <!-- SUB-TAB 3: Hybrid Sentence Grammar Analyzer -->
+        <div id="s2PaneGrammar" style="display:none;">
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+            본문 문장에 마우스를 올리고 <strong>[🔬 문법]</strong> 버튼을 누르거나, 드래그 팝오버에서 <strong>[문법 분석]</strong>을 클릭하세요.
+          </div>
+
+          <div id="grammarResultContainer">
+            <div class="grammar-box" style="text-align:center; color:var(--text-muted); font-size:0.83rem; padding:24px 12px;">
+              분석할 문장을 본문에서 선택해 주세요.<br/>
+              <button class="btn btn-sm" style="margin-top:10px;" onclick="analyzeFirstLongSentence()">
+                본문 첫 문장 문법 분석하기
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:14px; padding:10px;" onclick="switchStep(3)">
+          2독 완료 → ③ 3독(끊어 읽기 & Shadowing)으로 이동
+        </button>
+      </div>
+
+      <!-- ==================== STEP 3 SIDEBAR (SHADOWING & BREATH SLASH) ==================== -->
+      <div class="side-card" id="sidebarStep3" style="display:none;">
+        <div class="side-card-title">
+          <span>🗣️ 3독(Shadowing / Read Aloud) 훈련</span>
+          <span class="tag-pill guess" id="ttsProgressBadge">문장 0 / 0</span>
+        </div>
+        <p class="side-card-desc">
+          호흡 단위(<code>/</code>)로 끊어 소리 내어 읽으며 <strong>주어([S])와 본동사([V])</strong>를 영어 어순 그대로 뇌에 각인합니다.
+        </p>
+
+        <!-- Shadowing Player Box -->
+        <div style="background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">🎧 Web Speech 섀도잉 플레이어</span>
+            <label style="font-size:0.76rem; font-weight:600; display:flex; align-items:center; gap:4px; cursor:pointer;">
+              <input type="checkbox" id="ttsLoopCheck" onchange="toggleTtsLoop(this.checked)" />
+              현재 문장 반복
+            </label>
+          </div>
+
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+            <button type="button" class="btn btn-sm btn-success" style="flex:1;" onclick="playArticleTts()">▶ 연속 재생</button>
+            <button type="button" class="btn btn-sm" onclick="pauseOrResumeTts()">⏯ 일시정지/재개</button>
+            <button type="button" class="btn btn-sm" onclick="stopArticleTts()">⏹ 정지</button>
+          </div>
+
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn btn-xs" style="flex:1;" onclick="stepTtsSentence(-1)">⏮ 이전 문장</button>
+            <button type="button" class="btn btn-xs" style="flex:1;" onclick="stepTtsSentence(0)">🔊 현재 문장 다시</button>
+            <button type="button" class="btn btn-xs" style="flex:1;" onclick="stepTtsSentence(1)">⏭ 다음 문장</button>
+          </div>
+
+          <div id="ttsCurrentSentenceBox" style="margin-top:10px; padding:10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-serif); font-size:0.9rem; line-height:1.65; color:var(--text);">
+            본문 문장 옆의 <strong>[🔊 읽기]</strong> 버튼을 누르거나 상단 <strong>[▶ 연속 재생]</strong>을 눌러 소리 내어 따라 읽어보세요.
+          </div>
+        </div>
+
+        <ul class="checklist">
+          <li>
+            <input type="checkbox" id="chkShadowSlash" />
+            <label for="chkShadowSlash"><strong>의미 덩어리( / )</strong> 단위로 호흡을 끊으며 눈이 아닌 입으로 소리 내어 읽었나요?</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chkShadowSV" />
+            <label for="chkShadowSV">수식어구에 흔들리지 않고 <strong>주어([S])와 본동사([V])</strong>를 빠르게 연결했나요?</label>
+          </li>
+          <li>
+            <input type="checkbox" id="chkShadowChunks" />
+            <label for="chkShadowChunks">2독에서 수집한 <strong>핵심 청크 표현</strong>이 포함된 문장을 2회 이상 낭독했나요?</label>
+          </li>
+        </ul>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:8px; padding:10px;" onclick="switchStep(4)">
+          3독 완료 → ④ 1문장 요약(인출 연습)으로 이동
+        </button>
+      </div>
+
+      <!-- ==================== STEP 4 SIDEBAR (1-SENTENCE SUMMARY RETRIEVAL) ==================== -->
+      <div class="side-card" id="sidebarStep4" style="display:none;">
+        <div class="side-card-title">
+          <span>✍️ 4단계: 1문장 요약 (인출 훈련)</span>
+          <span class="tag-pill chunk" id="summaryChunkUsedBadge">청크 0개 사용됨</span>
+        </div>
+        <p class="side-card-desc">
+          기사를 덮고 방금 읽은 핵심 내용을 <strong>영어 1문장</strong>으로 직접 요약해 보세요. 수집한 표현 중 <strong>최소 1개</strong>를 반드시 포함해야 합니다!
+        </p>
+
+        <!-- Collected Chunks Checklist for Retrieval -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.78rem; font-weight:800;">📦 사용할 수집 청크 (클릭 시 요약창에 삽입)</span>
+            <span style="font-size:0.73rem; color:var(--text-muted);">최소 1개 필수</span>
+          </div>
+          <div id="step4ChunkChipsList" style="display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+
+        <!-- 1-Sentence Summary Input -->
+        <label class="form-label" for="summarySentenceInput">📝 나의 영어 1문장 요약 (1-Sentence Summary)</label>
+        <textarea
+          id="summarySentenceInput"
+          class="textarea-box"
+          style="min-height:95px; font-size:0.92rem;"
+          placeholder="기사를 보지 않고, 위 수집한 표현(Chunk) 중 최소 1개를 넣어 기사 전체 핵심을 영어 1문장으로 작성해 보세요..."
+          oninput="onSummaryInputChanged()"
+        ></textarea>
+
+        <!-- Real-time Retrieval Condition Checklist -->
+        <div id="summaryValidationBox" style="background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 11px; font-size:0.79rem; margin-bottom:12px; display:flex; flex-direction:column; gap:4px;">
+          <div id="valChunkRule">⬜ 조건 1: 수집한 청크 최소 1개 이상 포함</div>
+          <div id="valOneSentRule">⬜ 조건 2: 영어 1문장 작성 (6단어 이상)</div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <button type="button" class="btn btn-success" style="flex:1;" onclick="saveOneSentenceSummary()">
+            💾 요약 완료 & 복습장 저장
+          </button>
+          <button type="button" class="btn btn-purple" onclick="evaluateSummaryHybrid()">
+            🤖 요약 피드백/첨삭
+          </button>
+        </div>
+
+        <div id="summaryFeedbackBox" style="display:none; margin-top:10px;"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Floating Selection Popover (Adapts to Step 1 Locked vs Step 2 Unlocked) -->
+  <div class="selection-popover" id="selectionPopover">
+    <div class="popover-header">
+      <span id="popoverModeLabel">🔒 1독 문맥 추측 마킹</span>
+      <button type="button" style="background:none;border:none;color:#94a3b8;cursor:pointer;" onclick="hideSelectionPopover()">✕</button>
+    </div>
+    <div class="popover-selected-text" id="popoverSelectedText"></div>
+
+    <!-- Step 1 Locked Content -->
+    <div id="popoverStep1Box" style="display:flex; flex-direction:column; gap:8px;">
+      <input
+        type="text"
+        class="popover-input"
+        id="popoverGuessNote"
+        placeholder="문맥상 대략 어떤 뜻일지 추측 메모 (선택)"
+      />
+      <div class="popover-actions">
+        <button type="button" class="popover-btn" onclick="addContextGuess('pos')">➕ 긍정 뉘앙스</button>
+        <button type="button" class="popover-btn" onclick="addContextGuess('neg')">➖ 부정 뉘앙스</button>
+        <button type="button" class="popover-btn" onclick="addContextGuess('guess')">❓ 추측 기록</button>
+      </div>
+    </div>
+
+    <!-- Step 2 Unlocked Content (Dictionary / Chunk Save / Grammar) -->
+    <div id="popoverStep2Box" style="display:none; flex-direction:column; gap:8px;">
+      <div id="popoverQuickMeaning" style="font-size:0.82rem; color:#93c5fd; font-weight:600;">
+        뜻 조회 중...
+      </div>
+      <div class="popover-actions">
+        <button type="button" class="popover-btn primary" onclick="triggerPopoverDict()">📖 사전 상세</button>
+        <button type="button" class="popover-btn success" onclick="triggerPopoverChunkSave()">📦 청크 수집</button>
+        <button type="button" class="popover-btn" onclick="triggerPopoverGrammar()">🔬 문법 분석</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paste Article Modal -->
+  <div class="modal-backdrop" id="pasteModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 영어 기사 직접 붙여넣기</h3>
+        <button class="btn btn-sm" onclick="closeModal('pasteModal')">닫기</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pasteTitleInput">기사 헤드라인 (제목)</label>
+        <input type="text" id="pasteTitleInput" class="form-control" placeholder="예: Global Regulators Impose Strict Rules on Next-Gen AI" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pasteBodyInput">기사 본문 (소제목 앞에 ## 를 붙이거나 빈 줄로 문단을 구분하세요)</label>
+        <textarea id="pasteBodyInput" class="form-control" style="min-height:220px;" placeholder="여기에 영어 기사 본문을 붙여넣으세요..."></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeModal('pasteModal')">취소</button>
+        <button class="btn btn-primary" onclick="applyPastedArticle()">본문 적용하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Hybrid Settings Modal -->
+  <div class="modal-backdrop" id="aiModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🤖 하이브리드 AI 설정 (선택 사항)</h3>
+        <button class="btn btn-sm" onclick="closeModal('aiModal')">닫기</button>
+      </div>
+      <p style="font-size:0.83rem; color:var(--text-muted); margin-bottom:14px;">
+        API 키를 입력하지 않아도 <strong>무료 사전/번역 API와 규칙 기반 구문 분석</strong>으로 모든 기능을 즉시 사용할 수 있습니다. Gemini 또는 OpenAI API 키를 설정하면 2~4단계에서 <strong>AI 정밀 문법 구조 분석과 문맥 맞춤 풀이</strong>가 활성화됩니다. (키는 브라우저 <code>localStorage</code>에만 저장됩니다.)
+      </p>
+      <div class="form-group">
+        <label class="form-label" for="aiProviderSelect">AI 제공자</label>
+        <select id="aiProviderSelect" class="form-control">
+          <option value="gemini">Google Gemini (gemini-2.5-flash / gemini-1.5-flash)</option>
+          <option value="openai">OpenAI (gpt-4o-mini)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="aiApiKeyInput">API Key</label>
+        <input type="password" id="aiApiKeyInput" class="form-control" placeholder="AIza... 또는 sk-..." />
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <button class="btn btn-sm" onclick="clearAiSettings()">키 삭제 (기본 모드로 초기화)</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="closeModal('aiModal')">취소</button>
+          <button class="btn btn-primary" onclick="saveAiSettings()">저장하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Domain-Specific Element Extraction Rules Modal -->
+  <div class="modal-backdrop" id="domainRulesModal">
+    <div class="modal-card" style="max-width:700px; max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <h3 class="modal-title">🎯 도메인별 지정 Element 텍스트 추출 설정</h3>
+        <button class="btn btn-sm" onclick="closeModal('domainRulesModal')">닫기</button>
+      </div>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">
+        특정 뉴스/아티클 도메인에 대해 본문 텍스트를 추출할 <strong>HTML Element(CSS 선택자: 태그, <code>#id</code>, <code>.class</code>, <code>[속성]</code>)</strong>를 지정합니다. URL 입력 시 해당 도메인이 감지되면 지정된 Element 내부의 텍스트만 정밀 추출합니다.
+      </p>
+
+      <!-- Add / Update Domain Rule Form -->
+      <div style="background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:14px;">
+        <div style="font-size:0.82rem; font-weight:800; margin-bottom:8px; color:var(--primary);">➕ 새 도메인 추출 규칙 추가 / 수정</div>
+        <div class="domain-form-grid-1">
+          <div>
+            <label class="form-label" style="font-size:0.76rem;" for="ruleDomainInput">도메인 (예: bbc.com, koreaherald.com)</label>
+            <input type="text" id="ruleDomainInput" class="form-control" style="padding:6px 9px; font-size:0.82rem;" placeholder="예: bbc.com" />
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.76rem;" for="ruleSelectorInput">본문 추출 Element (CSS 선택자, 쉼표로 복수 지정 가능)</label>
+            <input type="text" id="ruleSelectorInput" class="form-control" style="padding:6px 9px; font-size:0.82rem;" placeholder="예: #article-body, .article__content, article" />
+          </div>
+        </div>
+        <div class="domain-form-grid-2">
+          <div>
+            <label class="form-label" style="font-size:0.76rem;" for="ruleTitleSelectorInput">제목 Element (선택, 기본값 h1)</label>
+            <input type="text" id="ruleTitleSelectorInput" class="form-control" style="padding:6px 9px; font-size:0.82rem;" placeholder="예: h1.headline, #main-heading" />
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.76rem;" for="ruleRemoveSelectorInput">제외할 하위 Element (선택)</label>
+            <input type="text" id="ruleRemoveSelectorInput" class="form-control" style="padding:6px 9px; font-size:0.82rem;" placeholder="예: .ad, .related-links, figure" />
+          </div>
+          <button class="btn btn-primary btn-sm" style="height:33px;" onclick="saveDomainRuleFromForm()">규칙 저장</button>
+        </div>
+      </div>
+
+      <!-- Registered Domain Rules List -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:0.82rem; font-weight:800;">📋 등록된 도메인별 Element 규칙 목록</span>
+        <button class="btn btn-xs" onclick="resetDefaultDomainRules()">기본 프리셋 복원</button>
+      </div>
+      <div id="domainRulesListContainer" style="flex:1; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; display:flex; flex-direction:column; gap:6px; max-height:280px;"></div>
+    </div>
+  </div>
+
+  <!-- Weekly Review Notebook Modal (Friday Routine & Data Backup) -->
+  <div class="modal-backdrop" id="reviewModal">
+    <div class="modal-card" style="max-width:780px; max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">📒 주간 복습장 (금요일 청크 인출 & 1문장 요약 기록)</h3>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
+            금요일 루틴: 주중에 모아둔 표현들만 다시 복습하며 뜻만 보고 영어로 인출하거나 새 문장을 만들어 보세요.
+          </div>
+        </div>
+        <button class="btn btn-sm" onclick="closeModal('reviewModal')">닫기</button>
+      </div>
+
+      <!-- Review Toolbar (Flashcard Toggle & JSON Export/Import) -->
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary" id="flashcardToggleBtn" onclick="toggleFlashcardHide()">
+            🙈 영어 표현 가리기 (뜻 보고 인출 테스트 OFF)
+          </button>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn btn-xs" onclick="exportLearningDataJson()">📥 학습 기록 JSON 백업</button>
+          <label class="btn btn-xs" style="cursor:pointer;">
+            📤 JSON 복원
+            <input type="file" accept=".json" style="display:none;" onchange="importLearningDataJson(event)" />
+          </label>
+        </div>
+      </div>
+
+      <div class="review-modal-grid">
+        <!-- Left: Collected Chunks & Friday Sentence Making -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:0.84rem; font-weight:800; color:var(--text);">
+            📦 누적 수집 청크 (<span id="reviewTotalChunksCount">0</span>개)
+          </div>
+          <div id="reviewChunksList" style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;"></div>
+
+          <div style="background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; margin-top:4px;">
+            <div style="font-size:0.8rem; font-weight:800; color:var(--primary); margin-bottom:6px;">
+              ✍️ 금요일 복습: 수집한 표현으로 새 문장 영작하기
+            </div>
+            <textarea
+              id="fridayPracticeInput"
+              class="textarea-box"
+              style="min-height:64px; margin-bottom:6px;"
+              placeholder="위 표현 중 하나를 골라 나만의 새로운 영어 문장을 만들어 보세요..."
+            ></textarea>
+            <button type="button" class="btn btn-success btn-sm" style="width:100%;" onclick="saveFridayPracticeSentence()">
+              ➕ 복습 영작 문장 저장
+            </button>
+            <div id="fridayPracticeList" style="margin-top:8px; display:flex; flex-direction:column; gap:6px; max-height:130px; overflow-y:auto;"></div>
+          </div>
+        </div>
+
+        <!-- Right: 1-Sentence Summary Archive -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:0.84rem; font-weight:800; color:var(--text);">
+            🏆 완료한 기사 & 1문장 요약 아카이브 (<span id="reviewTotalSummariesCount">0</span>편)
+          </div>
+          <div id="reviewSummariesList" style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Floating Quick-Jump Navigation (Shown on <= 1100px 1-Column Layout) -->
+  <div class="mobile-quick-nav" id="mobileQuickNav">
+    <button type="button" onclick="scrollToSection('article')" title="기사 본문 영역으로 이동">📰 본문</button>
+    <button type="button" class="primary-jump" onclick="scrollToSection('sidebar')" title="현재 단계 학습 패널로 이동">
+      🛠️ 학습패널 (<span id="mobileNavChunkBadge">0</span>)
+    </button>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // =========================================================================
+    // 1. Default Domain-Specific Element Extraction Presets
+    // =========================================================================
+    const DEFAULT_DOMAIN_RULES = [
+      {
+        domain: 'bbc.com',
+        contentSelector: 'article [data-component="text-block"], article [data-component="subheadline-block"], main article',
+        titleSelector: 'h1#main-heading, article h1, h1',
+        removeSelector: '[data-component="links-block"], [data-component="related-internet-links"], figure, aside'
+      },
+      {
+        domain: 'bbc.co.uk',
+        contentSelector: 'article [data-component="text-block"], article [data-component="subheadline-block"], main article',
+        titleSelector: 'h1#main-heading, article h1, h1',
+        removeSelector: '[data-component="links-block"], figure, aside'
+      },
+      {
+        domain: 'theguardian.com',
+        contentSelector: '#maincontent, [data-gu-name="body"], .article-body-commercial-selector, article',
+        titleSelector: '[data-gu-name="headline"] h1, h1',
+        removeSelector: 'aside, figure, .submeta, [data-WithComponent="rich-link"]'
+      },
+      {
+        domain: 'cnn.com',
+        contentSelector: '.article__content, .zn-body__paragraph, main article',
+        titleSelector: 'h1.headline__text, #maincontent, h1',
+        removeSelector: '.ad, .el__leafmedia, aside, figure'
+      },
+      {
+        domain: 'reuters.com',
+        contentSelector: '[data-testid="ArticleBody"], .article-body__content__17Yit, main article',
+        titleSelector: 'h1[data-testid="Heading"], h1',
+        removeSelector: '[data-testid="RelatedArticles"], aside, figure'
+      },
+      {
+        domain: 'apnews.com',
+        contentSelector: '.RichTextStoryBody, .Page-storyBody, main article',
+        titleSelector: 'h1.Page-headline, h1',
+        removeSelector: 'aside, figure, .Advertisement'
+      },
+      {
+        domain: 'npr.org',
+        contentSelector: '#storytext, .storytext, article',
+        titleSelector: '.storytitle h1, h1',
+        removeSelector: 'aside, .credit-caption, .bucketwrap, figure'
+      },
+      {
+        domain: 'koreaherald.com',
+        contentSelector: '#articleText, .article-body, .news_content, .view_con_t',
+        titleSelector: 'h1, .news_title, .view_tit',
+        removeSelector: 'figure, .ad, script, style'
+      },
+      {
+        domain: 'koreajoongangdaily.joins.com',
+        contentSelector: '#article_body, .article_body, .view_body, article',
+        titleSelector: 'h1.headline, h1',
+        removeSelector: 'figure, .ad_area, .related_news'
+      },
+      {
+        domain: 'koreatimes.co.kr',
+        contentSelector: '#startts, .view_page_news, .article_txt, article',
+        titleSelector: 'h1, .view_headline',
+        removeSelector: 'figure, .ad'
+      },
+      {
+        domain: 'news.naver.com',
+        contentSelector: '#dic_area, #newsct_article, #articeBody, .newsct_article',
+        titleSelector: '#title_area span, h2#title_area, h2.media_end_head_headline, h1',
+        removeSelector: '.end_photo_org, .nbd_table, .media_end_summary, .byline, figure, script, style'
+      },
+      {
+        domain: 'naver.com',
+        contentSelector: '#dic_area, #newsct_article, #articeBody, .newsct_article, .se-main-container',
+        titleSelector: '#title_area span, h2#title_area, .se-title-text, h1',
+        removeSelector: '.end_photo_org, .nbd_table, .media_end_summary, .byline, figure, script, style'
+      },
+      {
+        domain: 'techcrunch.com',
+        contentSelector: '.entry-content, .wp-block-post-content, article',
+        titleSelector: 'h1.wp-block-post-title, h1',
+        removeSelector: '.wp-block-tc23-related-articles, aside, figure'
+      }
+    ];
+
+    const STOPWORDS = new Set([
+      'the','a','an','to','of','in','on','at','for','with','by','from','as','into',
+      'and','or','but','nor','so','yet','is','are','was','were','be','been','being',
+      'have','has','had','do','does','did','will','would','shall','should','can','could',
+      'may','might','must','that','which','who','whom','whose','this','these','those',
+      'it','its','they','them','their','we','us','our','you','your','he','him','his',
+      'she','her','not','no','more','most','very','up','out','about','after','before',
+      'under','over','between','through','during','without','within','along','across'
+    ]);
+
+    // =========================================================================
+    // 2. Application State
+    // =========================================================================
+    const state = {
+      currentStep: 1,
+      step2SubTab: 'dict',   // 'dict' | 'chunks' | 'grammar'
+      skimView: 'dim',       // 'dim' | 'only' | 'full'
+      dictLocked: true,      // Locked by default in Step 1 (Skimming)
+      serifFont: true,
+      domainRules: [],       // [{ domain, contentSelector, titleSelector, removeSelector }]
+      article: {
+        id: '',
+        title: '',
+        sourceUrl: '',
+        rawText: '',
+        matchedRule: null,   // { domain, contentSelector } if extracted via domain rule
+        blocks: [],
+        wordCount: 0,
+        skimSentenceCount: 0,
+        totalSentenceCount: 0
+      },
+      mainIdeaNote: '',
+      contextGuesses: [],    // [{ id, text, type: 'pos'|'neg'|'guess', note }]
+      chunks: [],            // [{ id, expr, meaningKo, category, sourceSentence, createdAt }]
+      lastSelection: {
+        text: '',
+        sentence: '',
+        meaningKo: '',
+        expandedSuggestion: ''
+      },
+      currentGrammarSentence: '',
+      // Step 3 (Shadowing & Breath Slash & S-V Highlight & TTS)
+      step3ShowSlash: true,
+      step3ShowSV: false,
+      tts: {
+        rate: 0.95,
+        loopOne: false,
+        playing: false,
+        currentFlatIdx: 0,
+        flatSentences: []    // [{ bIdx, sIdx, text }]
+      },
+      // Step 4 (1-Sentence Summary & Article Cover)
+      step4CoverArticle: true,
+      summaryText: '',
+      // Weekly Review Archive (Summaries + Friday Practice Sentences)
+      weeklyArchive: {
+        summaries: [],       // [{ id, articleId, articleTitle, summary, usedChunks, allChunks, createdAt }]
+        practiceSentences: [] // [{ id, sentence, chunkUsed, createdAt }]
+      },
+      flashcardHideExpr: false,
+      timer: {
+        totalSeconds: 15 * 60,
+        remainingSeconds: 15 * 60,
+        running: false,
+        intervalId: null
+      },
+      aiConfig: {
+        provider: 'gemini',
+        apiKey: ''
+      }
+    };
+
+    // =========================================================================
+    // 3. Initialization
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      initDayRoutineBanner();
+      loadAiSettings();
+      loadDomainRules();
+      loadWeeklyArchive();
+      restoreLastArticleOrShowEmptyState();
+      setupTextSelectionHandler();
+    });
+
+    function initDayRoutineBanner() {
+      const day = new Date().getDay();
+      if (day === 5) {
+        setRoutineBanner('friday');
+      } else if (day === 0 || day === 6) {
+        setRoutineBanner('weekend');
+      } else {
+        setRoutineBanner('weekday');
+      }
+    }
+
+    function setRoutineBanner(mode) {
+      const badge = document.getElementById('routineDayBadge');
+      const text = document.getElementById('routineGuideText');
+      document.querySelectorAll('.day-switcher button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.routine === mode);
+      });
+
+      if (mode === 'weekday') {
+        badge.textContent = '월~목 15분 루틴';
+        badge.style.background = '#2563eb';
+        text.innerHTML = '<strong>지치지 않는 15분 사이클:</strong> 기사 1편 읽기(스키밍) + 반드시 써먹고 싶은 표현(Chunk) 3~5개 수집 + 영어 1문장 요약';
+      } else if (mode === 'friday') {
+        badge.textContent = '금요일 복습 루틴';
+        badge.style.background = '#10b981';
+        text.innerHTML = '<strong>주간 인출 데이:</strong> 새 기사 부담을 줄이고, 월~목 동안 모아둔 표현(Chunk)들만 다시 복습하며 직접 문장을 만들어 보세요.';
+      } else {
+        badge.textContent = '주말 리프레시';
+        badge.style.background = '#8b5cf6';
+        text.innerHTML = '<strong>가벼운 휴식 데이:</strong> 분석적인 독해 대신 <code>CNN 10</code> 영상이나 가벼운 영어 팟캐스트를 시청하며 귀를 열어두세요.';
+      }
+    }
+
+    // =========================================================================
+    // 4. 15-Minute Routine Timer
+    // =========================================================================
+    function toggleTimer() {
+      const btn = document.getElementById('timerStartBtn');
+      if (state.timer.running) {
+        clearInterval(state.timer.intervalId);
+        state.timer.running = false;
+        btn.textContent = '계속';
+      } else {
+        state.timer.running = true;
+        btn.textContent = '일시정지';
+        state.timer.intervalId = setInterval(() => {
+          if (state.timer.remainingSeconds > 0) {
+            state.timer.remainingSeconds--;
+            updateTimerUI();
+            if (state.timer.remainingSeconds === 0) {
+              showToast('⏰ 15분 목표 시간이 완료되었습니다! 이제 1문장 요약으로 마무리해 보세요.');
+            }
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(state.timer.intervalId);
+      state.timer.running = false;
+      state.timer.remainingSeconds = state.timer.totalSeconds;
+      document.getElementById('timerStartBtn').textContent = '시작';
+      updateTimerUI();
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(state.timer.remainingSeconds / 60);
+      const secs = state.timer.remainingSeconds % 60;
+      const display = document.getElementById('timerDisplay');
+      display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      display.classList.toggle('warning', state.timer.remainingSeconds <= 120);
+
+      const pct = (state.timer.remainingSeconds / state.timer.totalSeconds) * 100;
+      const bar = document.getElementById('timerProgressBar');
+      bar.style.width = `${Math.max(0, pct)}%`;
+      bar.style.background = state.timer.remainingSeconds <= 120 ? 'var(--danger)' : 'var(--primary)';
+    }
+
+    // =========================================================================
+    // 5. Article Parsing & Rendering
+    // =========================================================================
+    function splitIntoSentences(text) {
+      const cleaned = text.replace(/\s+/g, ' ').trim();
+      if (!cleaned) return [];
+      const matches = cleaned.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g);
+      return (matches || [cleaned]).map(s => s.trim()).filter(Boolean);
+    }
+
+    function parseArticleStructure(title, rawText, sourceUrl = '', matchedRule = null) {
+      const lines = rawText
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+      const rawBlocks = [];
+      for (const line of lines) {
+        if (line.startsWith('## ') || line.startsWith('### ')) {
+          rawBlocks.push({
+            type: 'subheading',
+            text: line.replace(/^#{2,3}\s+/, '').trim()
+          });
+        } else if (
+          line.length < 75 &&
+          !/[.!?]$/.test(line) &&
+          rawBlocks.length > 0
+        ) {
+          rawBlocks.push({
+            type: 'subheading',
+            text: line
+          });
+        } else {
+          rawBlocks.push({
+            type: 'paragraph',
+            text: line
+          });
+        }
+      }
+
+      const hasSubheadings = rawBlocks.some(b => b.type === 'subheading');
+      let paragraphIndex = 0;
+      let afterSubheading = false;
+      let totalWords = 0;
+      let skimSentenceCount = 0;
+      let totalSentenceCount = 0;
+
+      const blocks = rawBlocks.map(block => {
+        const words = block.text.split(/\s+/).filter(Boolean).length;
+        totalWords += words;
+
+        if (block.type === 'subheading') {
+          afterSubheading = true;
+          return {
+            type: 'subheading',
+            text: block.text
+          };
+        }
+
+        const currentParaIdx = paragraphIndex++;
+        const sentencesRaw = splitIntoSentences(block.text);
+        const isFirstTwoParas = currentParaIdx < 2;
+        const isFirstAfterSub = afterSubheading;
+        afterSubheading = false;
+
+        const sentences = sentencesRaw.map((sText, sIdx) => {
+          totalSentenceCount++;
+          const isKey =
+            isFirstTwoParas ||
+            (isFirstAfterSub && sIdx === 0) ||
+            (!hasSubheadings && sIdx === 0);
+
+          if (isKey) skimSentenceCount++;
+          return {
+            text: sText,
+            isKey
+          };
+        });
+
+        const isKeyPara = sentences.some(s => s.isKey);
+
+        return {
+          type: 'paragraph',
+          paraIndex: currentParaIdx,
+          isFirstTwoParas,
+          isFirstAfterSub,
+          isKeyPara,
+          sentences
+        };
+      });
+
+      return {
+        id: sourceUrl || title.slice(0, 32),
+        title: title || 'Untitled English Article',
+        sourceUrl,
+        rawText,
+        matchedRule,
+        blocks,
+        wordCount: totalWords,
+        skimSentenceCount,
+        totalSentenceCount
+      };
+    }
+
+    function renderArticle() {
+      const art = state.article;
+      const bodyEl = document.getElementById('articleBody');
+      const ruleBadgeEl = document.getElementById('metaExtractorRule');
+      const clearBtn = document.getElementById('clearArticleBtn');
+      const coverBanner = document.getElementById('articleCoverBanner');
+      const headlineEl = document.getElementById('articleHeadline');
+
+      if (!art.blocks || art.blocks.length === 0) {
+        headlineEl.textContent = '영어 기사 URL을 입력하여 학습을 시작하세요';
+        headlineEl.classList.remove('article-covered-blur');
+        bodyEl.classList.remove('article-covered-blur', 'step-2-active', 'step-3-active');
+        if (coverBanner) coverBanner.classList.remove('active');
+        document.getElementById('metaSource').textContent = '🌐 URL 입력 대기 중';
+        ruleBadgeEl.style.display = 'none';
+        clearBtn.style.display = 'none';
+        document.getElementById('metaWordCount').textContent = '📝 0 words';
+        document.getElementById('metaSkimTime').textContent = '⚡ 기사를 불러오면 예상 시간이 표시됩니다';
+        document.getElementById('skimSentenceRatio').textContent = '핵심 문장 0/0';
+
+        bodyEl.innerHTML = `
+          <div style="background:var(--surface-alt); border:1px dashed var(--border-strong); border-radius:var(--radius-md); padding:28px 24px; text-align:center; font-family:var(--font-sans);">
+            <div style="font-size:1.05rem; font-weight:800; color:var(--text); margin-bottom:8px;">
+              📰 상단 입력창에 영어 기사 URL을 입력하고 [기사 추출]을 눌러주세요
+            </div>
+            <p style="font-size:0.86rem; color:var(--text-muted); max-width:620px; margin:0 auto 16px auto; line-height:1.6;">
+              등록된 도메인(BBC, The Guardian, CNN, Reuters, Korea Herald, <strong>네이버 뉴스(news.naver.com)</strong> 등)은 <strong>지정된 HTML Element(CSS 선택자)</strong>에서 본문만 정밀 추출합니다.<br/>
+              원하는 사이트의 추출 Element를 직접 지정하려면 <strong>[🎯 도메인별 추출 Element 설정]</strong> 버튼을 클릭하세요.
+            </p>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('articleUrlInput').focus()">🔗 URL 입력하기</button>
+              <button type="button" class="btn" onclick="openDomainRulesModal()">🎯 도메인별 추출 Element 설정 (${state.domainRules.length}개)</button>
+              <button type="button" class="btn" onclick="openModal('pasteModal')">📋 본문 직접 붙여넣기</button>
+            </div>
+          </div>
+        `;
+        renderGuessList();
+        renderStep1GuessVerifyBar();
+        renderChunkList();
+        renderStep4Sidebar();
+        updateWeeklyReviewCountUI();
+        return;
+      }
+
+      headlineEl.textContent = art.title;
+
+      const host = art.sourceUrl
+        ? (() => {
+            try { return new URL(art.sourceUrl).hostname; }
+            catch { return 'Custom Article'; }
+          })()
+        : 'Direct Input';
+
+      document.getElementById('metaSource').textContent = `🌐 ${host}`;
+      if (art.matchedRule && art.matchedRule.contentSelector) {
+        ruleBadgeEl.style.display = 'inline-block';
+        ruleBadgeEl.textContent = `🎯 지정 Element 추출: ${art.matchedRule.domain} (${art.matchedRule.contentSelector})`;
+      } else {
+        ruleBadgeEl.style.display = 'none';
+      }
+      clearBtn.style.display = 'inline-flex';
+
+      document.getElementById('metaWordCount').textContent = `📝 ${art.wordCount} words`;
+      const fullMin = Math.max(1, Math.round(art.wordCount / 180));
+      document.getElementById('metaSkimTime').textContent = `⚡ 1독 스키밍 약 1분 / 정독 약 ${fullMin}분`;
+      document.getElementById('skimSentenceRatio').textContent =
+        `핵심 문장 ${art.skimSentenceCount}/${art.totalSentenceCount}`;
+
+      bodyEl.classList.toggle('step-2-active', state.currentStep === 2);
+      bodyEl.classList.toggle('step-3-active', state.currentStep === 3);
+
+      // Step 4 Article Cover / Blur handling
+      const isCovered = state.currentStep === 4 && state.step4CoverArticle;
+      bodyEl.classList.toggle('article-covered-blur', isCovered);
+      headlineEl.classList.toggle('article-covered-blur', isCovered);
+      if (coverBanner) {
+        coverBanner.classList.toggle('active', isCovered);
+      }
+
+      bodyEl.innerHTML = '';
+
+      // Rebuild flatSentences list for Step 3 TTS player
+      const flatSentences = [];
+      const activeTtsItem =
+        state.tts.playing && state.tts.flatSentences[state.tts.currentFlatIdx]
+          ? state.tts.flatSentences[state.tts.currentFlatIdx]
+          : null;
+
+      art.blocks.forEach((block, bIdx) => {
+        if (block.type === 'subheading') {
+          const h2 = document.createElement('h2');
+          h2.className = 'article-subheading';
+          h2.innerHTML = `<span class="skim-badge">소제목</span><span>${escapeHtml(block.text)}</span>`;
+          bodyEl.appendChild(h2);
+        } else {
+          const p = document.createElement('p');
+          p.className = `article-paragraph ${block.isKeyPara ? 'key-para' : 'non-key-para'}`;
+
+          if (block.isFirstTwoParas) {
+            const badge = document.createElement('span');
+            badge.className = 'skim-badge';
+            badge.textContent = `도입 ${block.paraIndex + 1}문단`;
+            p.appendChild(badge);
+          } else if (block.isFirstAfterSub) {
+            const badge = document.createElement('span');
+            badge.className = 'skim-badge';
+            badge.textContent = '소제목 첫 문장';
+            p.appendChild(badge);
+          }
+
+          block.sentences.forEach((sent, sIdx) => {
+            flatSentences.push({ bIdx, sIdx, text: sent.text });
+
+            const span = document.createElement('span');
+            const isActiveGrammar = state.currentGrammarSentence === sent.text;
+            const isTtsPlaying =
+              activeTtsItem && activeTtsItem.bIdx === bIdx && activeTtsItem.sIdx === sIdx;
+
+            span.className = `sentence-span ${sent.isKey ? 'skim-key' : 'skim-rest'} ${isActiveGrammar ? 'active-grammar-sentence' : ''} ${isTtsPlaying ? 'tts-playing' : ''}`;
+            span.dataset.block = bIdx;
+            span.dataset.sentence = sIdx;
+            span.dataset.sentenceText = sent.text;
+
+            const innerHtml =
+              state.currentStep === 3
+                ? renderStep3Sentence(sent.text)
+                : renderSentenceWithHighlights(sent.text);
+
+            span.innerHTML = `${innerHtml}<button type="button" class="sentence-grammar-btn" onclick="event.stopPropagation(); analyzeSentenceGrammarByIdx(${bIdx}, ${sIdx})" title="이 문장 문법 구조 분석">🔬 문법</button><button type="button" class="sentence-tts-btn" onclick="event.stopPropagation(); playSingleSentenceTts(${bIdx}, ${sIdx})" title="이 문장 낭독 듣기">🔊 읽기</button> `;
+            p.appendChild(span);
+          });
+
+          bodyEl.appendChild(p);
+        }
+      });
+
+      state.tts.flatSentences = flatSentences;
+
+      renderGuessList();
+      renderStep1GuessVerifyBar();
+      renderChunkList();
+      renderStep4Sidebar();
+      updateWeeklyReviewCountUI();
+    }
+
+    function renderSentenceWithHighlights(sentenceText) {
+      let safe = escapeHtml(sentenceText);
+
+      // 1) Highlight saved chunks (Step 2)
+      state.chunks.forEach(chunk => {
+        const escapedTarget = escapeRegExp(escapeHtml(chunk.expr));
+        if (!escapedTarget) return;
+        const regex = new RegExp(`(${escapedTarget})`, 'gi');
+        safe = safe.replace(
+          regex,
+          `<mark class="chunk-mark" title="수집한 청크: ${escapeHtml(chunk.meaningKo || '')}">$1</mark>`
+        );
+      });
+
+      // 2) Highlight context guesses (Step 1)
+      state.contextGuesses.forEach(item => {
+        const escapedTarget = escapeRegExp(escapeHtml(item.text));
+        if (!escapedTarget) return;
+        const regex = new RegExp(`(${escapedTarget})`, 'gi');
+        const titleAttr = item.note ? `title="1독 추측: ${escapeHtml(item.note)}"` : '';
+        safe = safe.replace(
+          regex,
+          `<mark class="context-mark ${item.type}" ${titleAttr}>$1</mark>`
+        );
+      });
+
+      return safe;
+    }
+
+    // =========================================================================
+    // 6. Domain-Specific Element Extraction Engine & Rule Manager
+    // =========================================================================
+    function loadDomainRules() {
+      try {
+        const raw = localStorage.getItem('eng_tutor_domain_rules_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Merge any newly added default presets (e.g., news.naver.com) if not present yet
+            const existingDomains = new Set(parsed.map(r => normalizeDomain(r.domain)));
+            DEFAULT_DOMAIN_RULES.forEach(defRule => {
+              if (!existingDomains.has(normalizeDomain(defRule.domain))) {
+                parsed.push(JSON.parse(JSON.stringify(defRule)));
+              }
+            });
+            state.domainRules = parsed;
+            saveDomainRules();
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('loadDomainRules error:', e);
+      }
+      state.domainRules = JSON.parse(JSON.stringify(DEFAULT_DOMAIN_RULES));
+      updateDomainRuleCountUI();
+    }
+
+    function saveDomainRules() {
+      try {
+        localStorage.setItem('eng_tutor_domain_rules_v1', JSON.stringify(state.domainRules));
+      } catch (e) {
+        console.warn('saveDomainRules error:', e);
+      }
+      updateDomainRuleCountUI();
+    }
+
+    function updateDomainRuleCountUI() {
+      const countEl = document.getElementById('domainRuleCount');
+      if (countEl) countEl.textContent = state.domainRules.length;
+    }
+
+    function normalizeDomain(hostOrUrl) {
+      let clean = (hostOrUrl || '').trim().toLowerCase();
+      if (!clean) return '';
+      try {
+        if (/^https?:\/\//i.test(clean)) {
+          clean = new URL(clean).hostname.toLowerCase();
+        }
+      } catch {}
+      return clean.replace(/^www\./, '').replace(/\/.*$/, '');
+    }
+
+    function findMatchingDomainRule(url) {
+      if (!url) return null;
+      const targetHost = normalizeDomain(url);
+      if (!targetHost) return null;
+
+      return (
+        state.domainRules.find(r => {
+          const ruleDom = normalizeDomain(r.domain);
+          return ruleDom && (targetHost === ruleDom || targetHost.endsWith(`.${ruleDom}`));
+        }) || null
+      );
+    }
+
+    function previewMatchedDomainRule(urlValue) {
+      const badge = document.getElementById('matchedDomainBadge');
+      if (!badge) return;
+      const rule = findMatchingDomainRule(urlValue);
+      if (rule) {
+        badge.style.display = 'inline-block';
+        badge.textContent = `🎯 ${rule.domain} Element 규칙 매칭됨`;
+        badge.title = `추출 선택자: ${rule.contentSelector}`;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function openDomainRulesModal() {
+      renderDomainRulesList();
+      const currentUrl = document.getElementById('articleUrlInput').value.trim();
+      const matched = findMatchingDomainRule(currentUrl);
+      if (matched) {
+        fillDomainRuleForm(matched);
+      } else if (currentUrl) {
+        document.getElementById('ruleDomainInput').value = normalizeDomain(currentUrl);
+      }
+      openModal('domainRulesModal');
+    }
+
+    function fillDomainRuleForm(rule) {
+      document.getElementById('ruleDomainInput').value = rule.domain || '';
+      document.getElementById('ruleSelectorInput').value = rule.contentSelector || '';
+      document.getElementById('ruleTitleSelectorInput').value = rule.titleSelector || '';
+      document.getElementById('ruleRemoveSelectorInput').value = rule.removeSelector || '';
+    }
+
+    function saveDomainRuleFromForm() {
+      const domain = normalizeDomain(document.getElementById('ruleDomainInput').value);
+      const contentSelector = document.getElementById('ruleSelectorInput').value.trim();
+      const titleSelector = document.getElementById('ruleTitleSelectorInput').value.trim() || 'h1';
+      const removeSelector = document.getElementById('ruleRemoveSelectorInput').value.trim();
+
+      if (!domain || !contentSelector) {
+        showToast('도메인과 본문 추출 Element(CSS 선택자)를 모두 입력해 주세요.');
+        return;
+      }
+
+      const newRule = { domain, contentSelector, titleSelector, removeSelector };
+      const existingIdx = state.domainRules.findIndex(r => normalizeDomain(r.domain) === domain);
+      if (existingIdx >= 0) {
+        state.domainRules[existingIdx] = newRule;
+        showToast(`도메인 규칙 수정 완료: ${domain}`);
+      } else {
+        state.domainRules.unshift(newRule);
+        showToast(`새 도메인 추출 규칙 등록 완료: ${domain}`);
+      }
+
+      saveDomainRules();
+      renderDomainRulesList();
+      previewMatchedDomainRule(document.getElementById('articleUrlInput').value);
+
+      document.getElementById('ruleDomainInput').value = '';
+      document.getElementById('ruleSelectorInput').value = '';
+      document.getElementById('ruleTitleSelectorInput').value = '';
+      document.getElementById('ruleRemoveSelectorInput').value = '';
+    }
+
+    function deleteDomainRule(domain) {
+      state.domainRules = state.domainRules.filter(
+        r => normalizeDomain(r.domain) !== normalizeDomain(domain)
+      );
+      saveDomainRules();
+      renderDomainRulesList();
+      previewMatchedDomainRule(document.getElementById('articleUrlInput').value);
+      showToast(`도메인 규칙 삭제됨: ${domain}`);
+    }
+
+    function resetDefaultDomainRules() {
+      state.domainRules = JSON.parse(JSON.stringify(DEFAULT_DOMAIN_RULES));
+      saveDomainRules();
+      renderDomainRulesList();
+      previewMatchedDomainRule(document.getElementById('articleUrlInput').value);
+      showToast('기본 영자 매체 도메인 프리셋으로 복원되었습니다.');
+    }
+
+    function renderDomainRulesList() {
+      const container = document.getElementById('domainRulesListContainer');
+      if (!container) return;
+
+      if (state.domainRules.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; padding:16px;">등록된 도메인 추출 규칙이 없습니다.</div>`;
+        return;
+      }
+
+      container.innerHTML = state.domainRules
+        .map(rule => {
+          const safeDom = escapeHtml(rule.domain).replace(/'/g, "\\'");
+          return `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.8rem;">
+              <div style="overflow:hidden;">
+                <div>
+                  <strong style="color:var(--primary);">${escapeHtml(rule.domain)}</strong>
+                  <span style="color:var(--text-muted); font-size:0.75rem; margin-left:6px;">제목: <code>${escapeHtml(rule.titleSelector || 'h1')}</code></span>
+                </div>
+                <div style="font-size:0.76rem; color:var(--text); margin-top:2px;">
+                  본문 Element: <code>${escapeHtml(rule.contentSelector)}</code>
+                  ${rule.removeSelector ? `<span style="color:var(--danger); margin-left:6px;">(제외: <code>${escapeHtml(rule.removeSelector)}</code>)</span>` : ''}
+                </div>
+              </div>
+              <div style="display:flex; gap:4px; flex-shrink:0;">
+                <button type="button" class="btn btn-xs" onclick="editDomainRuleByDomain('${safeDom}')">편집</button>
+                <button type="button" class="btn btn-xs" onclick="deleteDomainRule('${safeDom}')">삭제</button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function editDomainRuleByDomain(domain) {
+      const rule = state.domainRules.find(r => normalizeDomain(r.domain) === normalizeDomain(domain));
+      if (rule) fillDomainRuleForm(rule);
+    }
+
+    async function extractArticleFromUrl() {
+      const urlInput = document.getElementById('articleUrlInput');
+      const targetUrl = urlInput.value.trim();
+      if (!targetUrl) {
+        showToast('추출할 영어 기사 URL을 입력해 주세요.');
+        urlInput.focus();
+        return;
+      }
+
+      if (!/^https?:\/\//i.test(targetUrl)) {
+        showToast('올바른 URL 형식(http:// 또는 https://)을 입력해 주세요.');
+        return;
+      }
+
+      const matchedRule = findMatchingDomainRule(targetUrl);
+
+      if (matchedRule) {
+        setLoading(
+          true,
+          `[${matchedRule.domain}] 도메인 규칙 감지! 지정된 Element (${matchedRule.contentSelector})에서 텍스트를 추출하는 중...`
+        );
+
+        // 1) Try DOM parsing strictly using the designated CSS Selector via CORS proxies
+        try {
+          const ruleDomData = await extractViaDomainElementRule(targetUrl, matchedRule);
+          if (ruleDomData && ruleDomData.body && ruleDomData.body.split(/\s+/).length >= 25) {
+            applyExtractedArticle(ruleDomData.title, ruleDomData.body, targetUrl, matchedRule);
+            showToast(`🎯 [${matchedRule.domain}] 지정 Element(${matchedRule.contentSelector})에서 본문을 추출했습니다!`);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.warn('Domain element DOM extraction fallback:', e);
+        }
+
+        // 2) Fallback: Jina Reader with X-Target-Selector header for the designated element
+        try {
+          const jinaTargeted = await fetchViaJinaReader(targetUrl, matchedRule);
+          if (jinaTargeted && jinaTargeted.body && jinaTargeted.body.split(/\s+/).length >= 25) {
+            applyExtractedArticle(jinaTargeted.title, jinaTargeted.body, targetUrl, matchedRule);
+            showToast(`🎯 [${matchedRule.domain}] 지정 Element 기준으로 본문을 추출했습니다!`);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.warn('Jina targeted selector fallback:', e);
+        }
+      } else {
+        setLoading(true, '공개 웹 추출 엔진(Jina Reader / CORS Proxy)으로 기사 본문을 가져오는 중...');
+      }
+
+      // General extraction (when no domain rule matched or selector changed)
+      try {
+        const jinaData = await fetchViaJinaReader(targetUrl, null);
+        if (jinaData && jinaData.body && jinaData.body.split(/\s+/).length >= 35) {
+          applyExtractedArticle(jinaData.title, jinaData.body, targetUrl, null);
+          showToast('기사 본문을 성공적으로 추출했습니다!');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn('Jina Reader fallback:', e);
+      }
+
+      try {
+        const domData = await extractGenericDomViaProxies(targetUrl);
+        if (domData && domData.body && domData.body.split(/\s+/).length >= 35) {
+          applyExtractedArticle(domData.title, domData.body, targetUrl, null);
+          showToast('CORS 프록시를 통해 기사 본문을 추출했습니다!');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn('Generic proxy fallback:', e);
+      }
+
+      setLoading(false);
+      showToast('자동 추출이 제한되었거나 선택자가 일치하지 않습니다. [도메인별 추출 Element 설정]을 확인하거나 본문을 직접 붙여넣어 주세요.');
+      openModal('pasteModal');
+    }
+
+    async function fetchHtmlWithCorsProxies(url) {
+      const proxyGenerators = [
+        u => ({ url: `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, mode: 'allorigins' }),
+        u => ({ url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`, mode: 'raw' })
+      ];
+
+      for (const gen of proxyGenerators) {
+        try {
+          const { url: pUrl, mode } = gen(url);
+          const res = await fetch(pUrl);
+          if (!res.ok) continue;
+          if (mode === 'allorigins') {
+            const json = await res.json();
+            if (json && json.contents && json.contents.length > 200) return json.contents;
+          } else {
+            const text = await res.text();
+            if (text && text.length > 200) return text;
+          }
+        } catch (err) {
+          console.warn('Proxy attempt failed:', err);
+        }
+      }
+      throw new Error('All CORS HTML proxies failed');
+    }
+
+    /**
+     * Extracts text specifically from the CSS Element(s) configured for the matched domain
+     */
+    async function extractViaDomainElementRule(url, rule) {
+      const htmlString = await fetchHtmlWithCorsProxies(url);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+
+      // Remove global noise + domain-specific removeSelector elements
+      const baseRemove = 'script, style, noscript, iframe, svg, form, nav, footer';
+      const combinedRemove = rule.removeSelector ? `${baseRemove}, ${rule.removeSelector}` : baseRemove;
+      try {
+        doc.querySelectorAll(combinedRemove).forEach(el => el.remove());
+      } catch {
+        doc.querySelectorAll(baseRemove).forEach(el => el.remove());
+      }
+
+      // Extract title using rule.titleSelector
+      let title = '';
+      if (rule.titleSelector) {
+        try {
+          const titleEl = doc.querySelector(rule.titleSelector);
+          if (titleEl) title = titleEl.textContent.replace(/\s+/g, ' ').trim();
+        } catch {}
+      }
+      if (!title) {
+        title =
+          (doc.querySelector('h1') && doc.querySelector('h1').textContent.replace(/\s+/g, ' ').trim()) ||
+          doc.title ||
+          'Extracted Article';
+      }
+
+      // Query designated content element(s)
+      const targetContainers = Array.from(doc.querySelectorAll(rule.contentSelector));
+      if (targetContainers.length === 0) {
+        throw new Error(`Designated element not found: ${rule.contentSelector}`);
+      }
+
+      const lines = [];
+      const seen = new Set();
+
+      targetContainers.forEach(container => {
+        // If the matched element itself is a paragraph or heading
+        if (/^(P|H2|H3)$/i.test(container.tagName)) {
+          const txt = container.textContent.replace(/\s+/g, ' ').trim();
+          if (txt && !seen.has(txt)) {
+            seen.add(txt);
+            lines.push(/^H[23]$/i.test(container.tagName) ? `## ${txt}` : txt);
+          }
+          return;
+        }
+
+        // Extract paragraphs and subheadings inside the designated container
+        const childNodes = container.querySelectorAll('h2, h3, p');
+        if (childNodes.length > 0) {
+          childNodes.forEach(node => {
+            const txt = node.textContent.replace(/\s+/g, ' ').trim();
+            if (!txt || seen.has(txt)) return;
+            if (node.tagName === 'H2' || node.tagName === 'H3') {
+              if (txt.split(/\s+/).length >= 2 && txt.length < 120) {
+                seen.add(txt);
+                lines.push(`## ${txt}`);
+              }
+            } else if (txt.split(/\s+/).length >= 5) {
+              seen.add(txt);
+              lines.push(txt);
+            }
+          });
+        } else {
+          // If container uses direct text / <br> instead of <p> tags (e.g. Naver News #dic_area)
+          container.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+          const rawBlocks = (container.textContent || '').split(/\r?\n/);
+          rawBlocks.forEach(b => {
+            const txt = b.replace(/\s+/g, ' ').trim();
+            if (txt.split(/\s+/).length >= 5 && !seen.has(txt)) {
+              seen.add(txt);
+              lines.push(txt);
+            }
+          });
+        }
+      });
+
+      return { title, body: lines.join('\n\n') };
+    }
+
+    async function fetchViaJinaReader(url, rule = null) {
+      const headers = { 'Accept': 'application/json' };
+      if (rule && rule.contentSelector) {
+        headers['X-Target-Selector'] = rule.contentSelector;
+      }
+      if (rule && rule.removeSelector) {
+        headers['X-Remove-Selector'] = rule.removeSelector;
+      }
+
+      const res = await fetch(`https://r.jina.ai/${url}`, { headers });
+      if (!res.ok) throw new Error(`Jina HTTP ${res.status}`);
+      const json = await res.json();
+      if (json && json.data && json.data.content) {
+        const cleaned = cleanMarkdownToArticleText(json.data.content);
+        return {
+          title: json.data.title || 'Extracted English Article',
+          body: cleaned
+        };
+      }
+      throw new Error('Empty Jina content');
+    }
+
+    function cleanMarkdownToArticleText(md) {
+      return md
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\((?:https?:\/\/[^)]+)\)/g, '$1')
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => {
+          if (!line) return false;
+          if (/^(share|subscribe|sign in|log in|advertisement|cookie|related|read more)/i.test(line)) return false;
+          if (line.startsWith('## ') || line.startsWith('### ')) return true;
+          return line.split(/\s+/).length >= 6;
+        })
+        .join('\n\n');
+    }
+
+    async function extractGenericDomViaProxies(url) {
+      const htmlString = await fetchHtmlWithCorsProxies(url);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      doc.querySelectorAll('script, style, nav, header, footer, aside, form, noscript, iframe, svg').forEach(el => el.remove());
+
+      const title =
+        (doc.querySelector('h1') && doc.querySelector('h1').textContent.trim()) ||
+        doc.title ||
+        'Extracted Article';
+
+      const root = doc.querySelector('article') || doc.querySelector('main') || doc.body;
+      const nodes = root.querySelectorAll('h2, h3, p');
+      const lines = [];
+
+      nodes.forEach(node => {
+        const txt = node.textContent.replace(/\s+/g, ' ').trim();
+        if (!txt) return;
+        if (node.tagName === 'H2' || node.tagName === 'H3') {
+          if (txt.split(/\s+/).length >= 2 && txt.length < 110) {
+            lines.push(`## ${txt}`);
+          }
+        } else if (txt.split(/\s+/).length >= 8) {
+          lines.push(txt);
+        }
+      });
+
+      return { title, body: lines.join('\n\n') };
+    }
+
+    function applyExtractedArticle(title, rawText, sourceUrl, matchedRule = null) {
+      state.article = parseArticleStructure(title, rawText, sourceUrl, matchedRule);
+      loadSavedArticleState(state.article.id);
+      saveLastLoadedArticle(title, rawText, sourceUrl, matchedRule);
+      renderArticle();
+      resetTimer();
+    }
+
+    function saveLastLoadedArticle(title, rawText, sourceUrl, matchedRule) {
+      try {
+        localStorage.setItem(
+          'eng_tutor_last_loaded_article_v3',
+          JSON.stringify({ title, rawText, sourceUrl, matchedRule })
+        );
+      } catch {}
+    }
+
+    function restoreLastArticleOrShowEmptyState() {
+      try {
+        const raw = localStorage.getItem('eng_tutor_last_loaded_article_v3');
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (saved && saved.rawText) {
+            if (saved.sourceUrl && !saved.sourceUrl.startsWith('custom://')) {
+              document.getElementById('articleUrlInput').value = saved.sourceUrl;
+              previewMatchedDomainRule(saved.sourceUrl);
+            }
+            state.article = parseArticleStructure(
+              saved.title,
+              saved.rawText,
+              saved.sourceUrl,
+              saved.matchedRule || null
+            );
+            loadSavedArticleState(state.article.id);
+            renderArticle();
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Restore last article error:', e);
+      }
+      renderArticle();
+    }
+
+    function clearCurrentArticle() {
+      localStorage.removeItem('eng_tutor_last_loaded_article_v3');
+      state.article = {
+        id: '',
+        title: '',
+        sourceUrl: '',
+        rawText: '',
+        matchedRule: null,
+        blocks: [],
+        wordCount: 0,
+        skimSentenceCount: 0,
+        totalSentenceCount: 0
+      };
+      state.contextGuesses = [];
+      state.chunks = [];
+      state.mainIdeaNote = '';
+      document.getElementById('mainIdeaInput').value = '';
+      document.getElementById('articleUrlInput').value = '';
+      previewMatchedDomainRule('');
+      renderArticle();
+      showToast('본문이 초기화되었습니다. 새 영어 기사 URL을 입력해 주세요.');
+    }
+
+    function applyPastedArticle() {
+      const title = document.getElementById('pasteTitleInput').value.trim() || 'Custom Pasted Article';
+      const body = document.getElementById('pasteBodyInput').value.trim();
+      if (!body) {
+        showToast('본문 텍스트를 입력해 주세요.');
+        return;
+      }
+      closeModal('pasteModal');
+      applyExtractedArticle(title, body, 'custom://pasted-article', null);
+      showToast('붙여넣은 기사가 로드되었습니다.');
+    }
+
+    // =========================================================================
+    // 7. Selection Handler & Step 1 / Step 2 Popover Routing
+    // =========================================================================
+    function setSkimView(mode) {
+      state.skimView = mode;
+      document.querySelectorAll('[data-skim]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.skim === mode);
+      });
+      const bodyEl = document.getElementById('articleBody');
+      bodyEl.classList.remove('skim-mode-dim', 'skim-mode-only', 'skim-mode-full');
+      bodyEl.classList.add(`skim-mode-${mode}`);
+    }
+
+    function toggleDictLock() {
+      state.dictLocked = !state.dictLocked;
+      const btn = document.getElementById('dictLockBtn');
+      if (state.dictLocked) {
+        btn.className = 'lock-badge';
+        btn.textContent = '🔒 사전 잠금 (문맥 추측 ON)';
+        showToast('1독 사전 잠금이 활성화되었습니다. 모르는 단어는 문맥으로 추측해 보세요!');
+      } else {
+        btn.className = 'lock-badge unlocked';
+        btn.textContent = '🔓 사전 잠금 해제됨 (사전/청크 활성)';
+        showToast('사전 잠금이 해제되어 본문 드래그 시 뜻 조회가 가능합니다.');
+      }
+    }
+
+    function toggleReaderFont() {
+      state.serifFont = !state.serifFont;
+      const bodyEl = document.getElementById('articleBody');
+      const btn = document.getElementById('fontToggleBtn');
+      bodyEl.classList.toggle('font-sans', !state.serifFont);
+      btn.textContent = state.serifFont ? 'Aa 세리프' : 'Aa 산세리프';
+    }
+
+    function setupTextSelectionHandler() {
+      const container = document.getElementById('articleBody');
+      let selectionDebounceTimer = null;
+
+      async function handleCurrentSelection(targetEl) {
+        const popover = document.getElementById('selectionPopover');
+        if (targetEl && popover.contains(targetEl)) return;
+        if (
+          targetEl &&
+          targetEl.classList &&
+          (targetEl.classList.contains('sentence-grammar-btn') ||
+            targetEl.classList.contains('sentence-tts-btn'))
+        ) {
+          return;
+        }
+
+        const sel = window.getSelection();
+        const selectedText = sel ? sel.toString().replace(/\s+/g, ' ').trim() : '';
+        if (!selectedText || selectedText.length < 2 || selectedText.length > 140) {
+          if (targetEl && !popover.contains(targetEl)) {
+            hideSelectionPopover();
+          }
+          return;
+        }
+
+        if (!sel.anchorNode || !container.contains(sel.anchorNode)) {
+          return;
+        }
+
+        // Avoid re-fetching if same selection is already visible
+        if (popover.classList.contains('visible') && popover.dataset.selected === selectedText) {
+          return;
+        }
+
+        // Find containing sentence
+        let node = sel.anchorNode;
+        while (node && node !== container && !(node.classList && node.classList.contains('sentence-span'))) {
+          node = node.parentNode;
+        }
+        const containingSentence = (node && node.dataset && node.dataset.sentenceText) || '';
+
+        state.lastSelection = {
+          text: selectedText,
+          sentence: containingSentence,
+          meaningKo: '',
+          expandedSuggestion: suggestExpandedChunk(selectedText, containingSentence)
+        };
+
+        const range = sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+        const rect = range ? range.getBoundingClientRect() : { top: 200, left: 20 };
+
+        document.getElementById('popoverSelectedText').textContent = `"${selectedText}"`;
+
+        const useStep1Lock = state.currentStep === 1 && state.dictLocked;
+        document.getElementById('popoverModeLabel').textContent = useStep1Lock
+          ? '🔒 1독 문맥 추측 마킹 (사전 잠금 중)'
+          : '⛏️ 2독 표현(Chunk) & 사전 도구';
+
+        document.getElementById('popoverStep1Box').style.display = useStep1Lock ? 'flex' : 'none';
+        document.getElementById('popoverStep2Box').style.display = useStep1Lock ? 'none' : 'flex';
+
+        if (window.innerWidth <= 768) {
+          // Mobile: CSS docks popover as a bottom action sheet so it never collides with OS copy/share menu
+          popover.style.top = '';
+          popover.style.left = '';
+        } else {
+          const top = Math.max(12, rect.top - 140);
+          const left = Math.min(window.innerWidth - 350, Math.max(12, rect.left));
+          popover.style.top = `${top}px`;
+          popover.style.left = `${left}px`;
+        }
+
+        popover.dataset.selected = selectedText;
+        popover.classList.add('visible');
+
+        if (!useStep1Lock) {
+          const quickMeaningEl = document.getElementById('popoverQuickMeaning');
+          quickMeaningEl.textContent = '한국어 뜻 조회 중...';
+          const ko = await fetchKoreanTranslation(selectedText);
+          state.lastSelection.meaningKo = ko;
+          quickMeaningEl.textContent = `🇰🇷 ${ko || '뜻을 불러올 수 없습니다'}`;
+
+          // If currently in Step 2 on desktop, automatically update the dictionary pane in sidebar
+          if (state.currentStep === 2) {
+            lookupDictionary(selectedText, containingSentence);
+          }
+        } else {
+          document.getElementById('popoverGuessNote').value = '';
+        }
+      }
+
+      // 1) Desktop mouseup
+      document.addEventListener('mouseup', e => {
+        handleCurrentSelection(e.target);
+      });
+
+      // 2) Mobile touch end
+      document.addEventListener(
+        'touchend',
+        e => {
+          setTimeout(() => handleCurrentSelection(e.target), 120);
+        },
+        { passive: true }
+      );
+
+      // 3) Mobile selection handle dragging (selectionchange with debounce)
+      document.addEventListener('selectionchange', () => {
+        clearTimeout(selectionDebounceTimer);
+        selectionDebounceTimer = setTimeout(() => {
+          const sel = window.getSelection();
+          if (sel && sel.anchorNode && container.contains(sel.anchorNode)) {
+            const txt = sel.toString().replace(/\s+/g, ' ').trim();
+            if (txt.length >= 2 && txt.length <= 140) {
+              handleCurrentSelection(null);
+            }
+          }
+        }, 280);
+      });
+    }
+
+    function hideSelectionPopover() {
+      const popover = document.getElementById('selectionPopover');
+      popover.classList.remove('visible');
+      popover.dataset.selected = '';
+    }
+
+    function scrollToSection(section) {
+      const el =
+        section === 'sidebar'
+          ? document.getElementById('learningSidebar')
+          : document.getElementById('modeToolbar');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function triggerPopoverDict() {
+      if (state.currentStep !== 2) switchStep(2);
+      switchStep2SubTab('dict');
+      lookupDictionary(state.lastSelection.text, state.lastSelection.sentence);
+      hideSelectionPopover();
+      if (window.innerWidth <= 1100) {
+        setTimeout(() => scrollToSection('sidebar'), 80);
+      }
+    }
+
+    async function triggerPopoverChunkSave() {
+      const expr = state.lastSelection.text;
+      if (!expr) return;
+      if (state.currentStep !== 2) switchStep(2);
+      const meaning = state.lastSelection.meaningKo || (await fetchKoreanTranslation(expr));
+      saveChunkItem(expr, meaning, state.lastSelection.sentence);
+      hideSelectionPopover();
+    }
+
+    function triggerPopoverGrammar() {
+      const targetSent = state.lastSelection.sentence || state.lastSelection.text;
+      if (!targetSent) return;
+      if (state.currentStep !== 2) switchStep(2);
+      switchStep2SubTab('grammar');
+      analyzeSentenceGrammar(targetSent);
+      hideSelectionPopover();
+      if (window.innerWidth <= 1100) {
+        setTimeout(() => scrollToSection('sidebar'), 80);
+      }
+    }
+
+    // =========================================================================
+    // 8. Step 2: Integrated Dictionary (Korean + Free Dictionary API + Audio)
+    // =========================================================================
+    /**
+     * Suggests a 3~6 word chunk around a single selected word from its containing sentence
+     */
+    function suggestExpandedChunk(selectedText, sentence) {
+      if (!sentence) return '';
+      const words = selectedText.trim().split(/\s+/);
+      if (words.length >= 2) return ''; // Already a multi-word chunk
+
+      const cleanTarget = words[0].replace(/[^a-zA-Z-]/g, '');
+      if (!cleanTarget) return '';
+
+      const tokens = sentence.split(/\s+/);
+      const idx = tokens.findIndex(t => t.toLowerCase().includes(cleanTarget.toLowerCase()));
+      if (idx === -1) return '';
+
+      const start = Math.max(0, idx);
+      const end = Math.min(tokens.length, idx + 5);
+      let slice = tokens.slice(start, end).join(' ').replace(/[.,;!?]+$/, '');
+      if (slice.split(/\s+/).length < 3 && idx > 0) {
+        slice = tokens.slice(Math.max(0, idx - 1), Math.min(tokens.length, idx + 4)).join(' ').replace(/[.,;!?]+$/, '');
+      }
+      return slice.split(/\s+/).length >= 2 ? slice : '';
+    }
+
+    async function fetchKoreanTranslation(text) {
+      const clean = text.trim();
+      if (!clean) return '';
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&q=${encodeURIComponent(clean)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && Array.isArray(data[0])) {
+            return data[0].map(seg => seg[0]).join('').trim();
+          }
+        }
+      } catch (e) {
+        console.warn('GTX translate fallback:', e);
+      }
+
+      try {
+        const mmUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(clean)}&langpair=en|ko`;
+        const res = await fetch(mmUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.responseData && data.responseData.translatedText) {
+            return data.responseData.translatedText.trim();
+          }
+        }
+      } catch (e) {
+        console.warn('MyMemory translate fallback:', e);
+      }
+      return '';
+    }
+
+    async function fetchEnglishDictionaryEntry(word) {
+      const cleanWord = word.toLowerCase().replace(/[^a-z-]/g, '');
+      if (!cleanWord) return null;
+      try {
+        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanWord)}`);
+        if (!res.ok) return null;
+        const json = await res.json();
+        return Array.isArray(json) && json.length > 0 ? json[0] : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function extractCandidateWords(phrase) {
+      const rawTokens = phrase
+        .split(/\s+/)
+        .map(w => w.replace(/[^a-zA-Z-]/g, ''))
+        .filter(w => w.length >= 2);
+      if (rawTokens.length <= 1) return rawTokens;
+      const contentWords = rawTokens.filter(w => !STOPWORDS.has(w.toLowerCase()));
+      return contentWords.length > 0 ? contentWords : rawTokens;
+    }
+
+    async function lookupDictionary(queryText, contextSentence = '') {
+      const query = (queryText || '').trim();
+      if (!query) return;
+
+      document.getElementById('dictSearchInput').value = query;
+      const container = document.getElementById('dictResultContainer');
+      container.innerHTML = `
+        <div class="dict-result-box" style="text-align:center; padding:20px;">
+          <div class="spinner" style="margin:0 auto 8px auto;"></div>
+          <div style="font-size:0.82rem; color:var(--text-muted);">"${escapeHtml(query)}" 사전 및 한국어 뜻 조회 중...</div>
+        </div>
+      `;
+
+      const words = query.split(/\s+/);
+      const isSingleWord = words.length === 1;
+      const candidateWords = extractCandidateWords(query);
+      const primaryHeadword = candidateWords[0] || words[0];
+
+      const [meaningKo, dictEntry] = await Promise.all([
+        fetchKoreanTranslation(query),
+        fetchEnglishDictionaryEntry(primaryHeadword)
+      ]);
+
+      state.lastSelection.text = query;
+      state.lastSelection.meaningKo = meaningKo;
+      if (contextSentence) {
+        state.lastSelection.sentence = contextSentence;
+      }
+      const expandedChunk = suggestExpandedChunk(query, state.lastSelection.sentence);
+
+      renderDictionaryResult({
+        query,
+        isSingleWord,
+        meaningKo,
+        candidateWords,
+        activeWord: primaryHeadword,
+        dictEntry,
+        expandedChunk,
+        contextSentence: state.lastSelection.sentence
+      });
+    }
+
+    async function switchDictCandidateWord(word) {
+      const box = document.getElementById('dictEntrySubContainer');
+      if (!box) return;
+      box.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); padding:10px 0;">"${escapeHtml(word)}" 영영 사전 로딩 중...</div>`;
+      document.querySelectorAll('.word-chip[data-dictword]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.dictword.toLowerCase() === word.toLowerCase());
+      });
+      const entry = await fetchEnglishDictionaryEntry(word);
+      box.innerHTML = renderDictEntryHtml(word, entry);
+    }
+
+    function renderDictionaryResult(data) {
+      const {
+        query,
+        isSingleWord,
+        meaningKo,
+        candidateWords,
+        activeWord,
+        dictEntry,
+        expandedChunk,
+        contextSentence
+      } = data;
+
+      const safeQueryAttr = escapeHtml(query).replace(/'/g, "\\'");
+      const safeMeaningAttr = escapeHtml(meaningKo || '').replace(/'/g, "\\'");
+
+      // Check if user guessed this in Step 1
+      const step1Guess = state.contextGuesses.find(
+        g => g.text.toLowerCase() === query.toLowerCase()
+      );
+
+      let coachHtml = '';
+      if (isSingleWord) {
+        coachHtml = `
+          <div class="chunk-coach-banner">
+            💡 <strong>청크(Chunk) 수집 코칭:</strong> 단어 1개(<code>${escapeHtml(query)}</code>)만 외우면 실전 문장으로 잘 나오지 않습니다.
+            ${
+              expandedChunk
+                ? `<div style="margin-top:6px;">
+                    <button class="btn btn-xs btn-primary" onclick="lookupDictionary('${escapeHtml(expandedChunk).replace(/'/g, "\\'")}')">
+                      ✨ 문맥 청크로 확장: "${escapeHtml(expandedChunk)}"
+                    </button>
+                  </div>`
+                : '본문에서 앞뒤 동사구·전치사구(3~5단어)를 함께 드래그해 수집해 보세요!'
+            }
+          </div>
+        `;
+      }
+
+      let guessCompareHtml = '';
+      if (step1Guess) {
+        guessCompareHtml = `
+          <div style="background:#eef2ff; border:1px solid #c7d2fe; padding:7px 10px; border-radius:6px; font-size:0.78rem; color:#3730a3; margin-bottom:8px;">
+            🔍 <strong>1독 문맥 추측 비교:</strong> 내 추측 = <strong>${escapeHtml(step1Guess.note || step1Guess.type)}</strong>
+          </div>
+        `;
+      }
+
+      let candidateChipsHtml = '';
+      if (candidateWords.length > 1) {
+        candidateChipsHtml = `
+          <div style="margin-top:8px;">
+            <span style="font-size:0.74rem; color:var(--text-muted); font-weight:700;">구문 내 핵심 어휘 영영사전 보기:</span>
+            <div class="word-chip-bar">
+              ${candidateWords
+                .map(
+                  w => `<button type="button" class="word-chip ${w.toLowerCase() === activeWord.toLowerCase() ? 'active' : ''}" data-dictword="${escapeHtml(w)}" onclick="switchDictCandidateWord('${escapeHtml(w).replace(/'/g, "\\'")}')">${escapeHtml(w)}</button>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      const container = document.getElementById('dictResultContainer');
+      container.innerHTML = `
+        <div class="dict-result-box">
+          <div class="dict-head">
+            <div>
+              <div class="dict-query-title">${escapeHtml(query)}</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-xs" onclick="speakText('${safeQueryAttr}')" title="발음 듣기">🔊 발음</button>
+              <button class="btn btn-xs btn-success" onclick="saveChunkItem('${safeQueryAttr}', '${safeMeaningAttr}')">
+                📦 청크 수집함에 저장
+              </button>
+            </div>
+          </div>
+
+          ${guessCompareHtml}
+
+          <div class="dict-ko-meaning">
+            🇰🇷 ${escapeHtml(meaningKo || '번역 결과를 가져오지 못했습니다.')}
+          </div>
+
+          ${coachHtml}
+          ${candidateChipsHtml}
+
+          <div id="dictEntrySubContainer">
+            ${renderDictEntryHtml(activeWord, dictEntry)}
+          </div>
+
+          ${
+            state.aiConfig.apiKey
+              ? `<div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);">
+                  <button class="btn btn-xs btn-purple" style="width:100%;" onclick="explainExpressionWithAI('${safeQueryAttr}')">
+                    🤖 AI 문맥 뉘앙스 & 연어(Collocation) 해설 보기
+                  </button>
+                  <div id="aiDictExplainBox" style="margin-top:8px; font-size:0.8rem;"></div>
+                </div>`
+              : ''
+          }
+        </div>
+      `;
+    }
+
+    function renderDictEntryHtml(word, entry) {
+      if (!entry) {
+        return `
+          <div style="font-size:0.79rem; color:var(--text-muted); margin-top:6px;">
+            ℹ️ "<strong>${escapeHtml(word)}</strong>"의 영영 사전 원형 엔트리를 찾지 못했습니다. (굴절형/고유명사일 수 있습니다)
+          </div>
+        `;
+      }
+
+      const phonetic =
+        entry.phonetic ||
+        (entry.phonetics && entry.phonetics.find(p => p.text)?.text) ||
+        '';
+      const audioUrl =
+        (entry.phonetics && entry.phonetics.find(p => p.audio && p.audio.length > 0)?.audio) ||
+        '';
+
+      const meaningsHtml = (entry.meanings || [])
+        .slice(0, 3)
+        .map(m => {
+          const defs = (m.definitions || [])
+            .slice(0, 2)
+            .map(
+              d => `
+                <li>
+                  <div>${escapeHtml(d.definition)}</div>
+                  ${d.example ? `<div class="dict-example">"${escapeHtml(d.example)}"</div>` : ''}
+                </li>
+              `
+            )
+            .join('');
+          return `
+            <div class="dict-pos-block">
+              <span class="dict-pos-tag">${escapeHtml(m.partOfSpeech || 'word')}</span>
+              <ol class="dict-def-list">${defs}</ol>
+            </div>
+          `;
+        })
+        .join('');
+
+      return `
+        <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border);">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <strong style="font-size:0.88rem;">📘 영영 사전 (${escapeHtml(entry.word || word)})</strong>
+              ${phonetic ? `<span class="dict-phonetic" style="margin-left:6px;">${escapeHtml(phonetic)}</span>` : ''}
+            </div>
+            ${
+              audioUrl
+                ? `<button class="btn btn-xs" onclick="playAudioUrl('${escapeHtml(audioUrl)}', '${escapeHtml(entry.word || word).replace(/'/g, "\\'")}')">🔈 원어민 음성</button>`
+                : ''
+            }
+          </div>
+          ${meaningsHtml}
+        </div>
+      `;
+    }
+
+    function playAudioUrl(url, fallbackText) {
+      if (url) {
+        const audio = new Audio(url);
+        audio.play().catch(() => speakText(fallbackText));
+      } else {
+        speakText(fallbackText);
+      }
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast('이 브라우저는 음성 합성(TTS)을 지원하지 않습니다.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // =========================================================================
+    // 9. Step 2: Chunk Collection Box (Target 3~5 Chunks)
+    // =========================================================================
+    function classifyChunkCategory(expr) {
+      const words = expr.trim().split(/\s+/);
+      if (words.length <= 1) return '단일 어휘 (확장 권장)';
+      const first = words[0].toLowerCase();
+      const preps = ['in','on','at','for','with','by','from','to','into','under','over','amid','across','through','between'];
+      if (preps.includes(first)) return '전치사구 (Prep Phrase)';
+      const verbMarkers = ['impose','hold','amplify','disrupt','safeguard','submit','levy','stifle','foster','bridge','refine','harmonize','navigate','overhaul','reduce','recover','buffer','preserve','tackle','shift'];
+      if (verbMarkers.includes(first) || /(ate|ize|ify|en|ing)$/.test(first)) {
+        return '동사구 (Verb Phrase)';
+      }
+      return '연어·청크 (Collocation)';
+    }
+
+    function saveChunkItem(expr, meaningKo = '', sourceSentence = '') {
+      const cleanExpr = (expr || '').trim();
+      if (!cleanExpr) return;
+
+      const sentence = sourceSentence || state.lastSelection.sentence || findSentenceContaining(cleanExpr);
+      const category = classifyChunkCategory(cleanExpr);
+
+      const existingIdx = state.chunks.findIndex(
+        c => c.expr.toLowerCase() === cleanExpr.toLowerCase()
+      );
+
+      const item = {
+        id: existingIdx >= 0 ? state.chunks[existingIdx].id : Date.now().toString(),
+        expr: cleanExpr,
+        meaningKo: meaningKo || '뜻 직접 입력 가능',
+        category,
+        sourceSentence: sentence,
+        createdAt: new Date().toISOString()
+      };
+
+      if (existingIdx >= 0) {
+        state.chunks[existingIdx] = item;
+        showToast(`청크 업데이트 완료: "${cleanExpr}"`);
+      } else {
+        state.chunks.unshift(item);
+        const count = state.chunks.length;
+        if (count >= 3 && count <= 5) {
+          showToast(`🎯 청크 저장 완료! (${count}개 — 권장 목표 3~5개 달성!)`);
+        } else if (count > 5) {
+          showToast(`📦 청크 저장 완료 (${count}개 — 기사당 3~5개 핵심 표현에 집중하는 것을 권장합니다)`);
+        } else {
+          showToast(`📦 청크 수집함에 저장되었습니다 (${count}/3~5개)`);
+        }
+      }
+
+      saveCurrentArticleState();
+      renderArticle();
+    }
+
+    async function addChunkManually() {
+      const exprInput = document.getElementById('manualChunkExpr');
+      const meanInput = document.getElementById('manualChunkMean');
+      const expr = exprInput.value.trim();
+      let mean = meanInput.value.trim();
+      if (!expr) {
+        showToast('저장할 영어 표현(Chunk)을 입력해 주세요.');
+        return;
+      }
+      if (!mean) {
+        mean = await fetchKoreanTranslation(expr);
+      }
+      saveChunkItem(expr, mean, findSentenceContaining(expr));
+      exprInput.value = '';
+      meanInput.value = '';
+    }
+
+    function findSentenceContaining(expr) {
+      const lower = expr.toLowerCase();
+      for (const b of state.article.blocks) {
+        if (b.type === 'paragraph') {
+          for (const s of b.sentences) {
+            if (s.text.toLowerCase().includes(lower)) return s.text;
+          }
+        }
+      }
+      return '';
+    }
+
+    function removeChunkItem(id) {
+      state.chunks = state.chunks.filter(c => c.id !== id);
+      saveCurrentArticleState();
+      renderArticle();
+    }
+
+    function editChunkMeaning(id) {
+      const item = state.chunks.find(c => c.id === id);
+      if (!item) return;
+      const updated = prompt(`"${item.expr}"의 한국어 뜻을 수정하세요:`, item.meaningKo);
+      if (updated !== null) {
+        item.meaningKo = updated.trim();
+        saveCurrentArticleState();
+        renderChunkList();
+      }
+    }
+
+    function renderChunkList() {
+      const count = state.chunks.length;
+      document.getElementById('tabChunkNum').textContent = count;
+      document.getElementById('step2ChunkCountBadge').textContent = `${count} / 5개`;
+      document.getElementById('toolbarChunkBadge').textContent = `📦 수집한 청크: ${count} / 5 (권장 3~5개)`;
+      document.getElementById('chunkGoalCountText').textContent = `${count} / 5`;
+      const mobileBadge = document.getElementById('mobileNavChunkBadge');
+      if (mobileBadge) mobileBadge.textContent = count;
+
+      const statusText = document.getElementById('chunkGoalStatusText');
+      const fill = document.getElementById('chunkMeterFill');
+      const pct = Math.min(100, (count / 5) * 100);
+      fill.style.width = `${pct}%`;
+
+      if (count === 0) {
+        statusText.textContent = '🎯 목표: 써먹고 싶은 표현(Chunk) 3~5개 수집';
+        fill.style.background = 'var(--primary)';
+      } else if (count < 3) {
+        statusText.textContent = `🌱 ${3 - count}개만 더 수집하면 권장 목표(3~5개) 달성!`;
+        fill.style.background = 'var(--primary)';
+      } else if (count <= 5) {
+        statusText.textContent = '✅ 최적 개수(3~5개) 달성! 이제 3독/요약으로 넘어가도 좋습니다.';
+        fill.style.background = 'var(--success)';
+      } else {
+        statusText.textContent = '⚠️ 5개 초과! 너무 많으면 기억하기 어렵습니다. 핵심 3~5개에 집중하세요.';
+        fill.style.background = 'var(--warning)';
+      }
+
+      const listEl = document.getElementById('chunkListContainer');
+      if (count === 0) {
+        listEl.innerHTML = `
+          <div style="text-align:center; color:var(--text-light); font-size:0.81rem; padding:20px 10px; border:1px dashed var(--border); border-radius:var(--radius-sm);">
+            아직 수집한 청크(Chunk)가 없습니다.<br/>
+            본문에서 <strong>동사구·전치사구·연어</strong>를 드래그해 저장해 보세요!
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = state.chunks
+        .map(item => {
+          const safeExpr = escapeHtml(item.expr).replace(/'/g, "\\'");
+          return `
+            <div class="chunk-card">
+              <div class="chunk-card-header">
+                <div>
+                  <span class="tag-pill chunk" style="margin-right:5px;">${escapeHtml(item.category)}</span>
+                  <div class="chunk-expr" style="margin-top:4px;">${escapeHtml(item.expr)}</div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn btn-xs" onclick="speakText('${safeExpr}')" title="발음 듣기">🔊</button>
+                  <button class="btn btn-xs" onclick="editChunkMeaning('${item.id}')" title="뜻 수정">✏️</button>
+                  <button class="btn btn-xs" onclick="removeChunkItem('${item.id}')" title="삭제">✕</button>
+                </div>
+              </div>
+              <div class="chunk-meaning">🇰🇷 ${escapeHtml(item.meaningKo)}</div>
+              ${
+                item.sourceSentence
+                  ? `<div class="chunk-sentence">📄 "${escapeHtml(item.sourceSentence)}"</div>`
+                  : ''
+              }
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function renderStep1GuessVerifyBar() {
+      const bar = document.getElementById('step1GuessVerifyBar');
+      const chips = document.getElementById('step1GuessChips');
+      if (state.contextGuesses.length === 0) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'block';
+      chips.innerHTML = state.contextGuesses
+        .map(
+          g => `<button type="button" class="word-chip" onclick="lookupDictionary('${escapeHtml(g.text).replace(/'/g, "\\'")}')">${escapeHtml(g.text)}</button>`
+        )
+        .join('');
+    }
+
+    // =========================================================================
+    // 10. Step 2: Hybrid Sentence Grammar Analyzer (Rule-Based + Optional AI)
+    // =========================================================================
+    function analyzeSentenceGrammarByIdx(bIdx, sIdx) {
+      const block = state.article.blocks[bIdx];
+      if (!block || !block.sentences || !block.sentences[sIdx]) return;
+      const sentence = block.sentences[sIdx].text;
+      if (state.currentStep !== 2) switchStep(2);
+      switchStep2SubTab('grammar');
+      analyzeSentenceGrammar(sentence);
+      if (window.innerWidth <= 1100) {
+        setTimeout(() => scrollToSection('sidebar'), 80);
+      }
+    }
+
+    function analyzeFirstLongSentence() {
+      for (const b of state.article.blocks) {
+        if (b.type === 'paragraph' && b.sentences.length > 0) {
+          analyzeSentenceGrammar(b.sentences[0].text);
+          return;
+        }
+      }
+    }
+
+    /**
+     * Rule-Based Syntactic Parser (No API Key required):
+     * Identifies main clause Subject (S), Main Verb (V), Subordinate/Relative Clauses, Participial/Prepositional Phrases
+     */
+    function performRuleBasedGrammarAnalysis(sentence) {
+      const clean = sentence.replace(/\s+/g, ' ').trim();
+      const words = clean.split(' ');
+
+      const auxAndLinkVerbs = new Set([
+        'is','are','was','were','has','have','had','will','would','can','could',
+        'must','should','may','might','do','does','did'
+      ]);
+      const commonFiniteVerbs = new Set([
+        'move','moves','moved','impose','unveiled','comes','came','demonstrated',
+        'emphasized','submit','levy','fail','voiced','stifle','argue','foster',
+        'allow','plan','overhaul','require','hope','depended','signed','note',
+        'reaches','cut','reveals','found','preserves','suggests','commute',
+        'disappears','report','allows','improves','are','is','was','were','have','has','will','must','can'
+      ]);
+      const clauseConnectors = [
+        'as', 'while', 'although', 'though', 'because', 'since', 'if', 'unless',
+        'when', 'before', 'after', 'until', 'so that', 'where', 'which', 'that', 'who', 'whose'
+      ];
+
+      // Split into introductory phrase (if comma before main clause) vs main clause
+      let introLead = '';
+      let mainPart = clean;
+      const firstCommaIdx = clean.indexOf(',');
+      if (
+        firstCommaIdx > 0 &&
+        firstCommaIdx < 65 &&
+        /^(Under|By|To|For|Over|When|As|While|In|After|Before|Looking|At)\b/i.test(clean)
+      ) {
+        introLead = clean.slice(0, firstCommaIdx + 1).trim();
+        mainPart = clean.slice(firstCommaIdx + 1).trim();
+      }
+
+      // Find Main Verb & Subject in mainPart
+      const mTokens = mainPart.split(/\s+/);
+      let verbStartIdx = -1;
+      let verbEndIdx = -1;
+
+      for (let i = 1; i < mTokens.length; i++) {
+        const w = mTokens[i].toLowerCase().replace(/[^a-z]/g, '');
+        if (
+          auxAndLinkVerbs.has(w) ||
+          commonFiniteVerbs.has(w) ||
+          (i >= 1 && i <= 8 && /(ed|es)$/.test(w) && !STOPWORDS.has(w))
+        ) {
+          verbStartIdx = i;
+          verbEndIdx = i;
+          // Extend verb group if auxiliary followed by participle/infinitive/adverb
+          while (verbEndIdx + 1 < mTokens.length && verbEndIdx - verbStartIdx < 3) {
+            const nextW = mTokens[verbEndIdx + 1].toLowerCase().replace(/[^a-z]/g, '');
+            if (
+              auxAndLinkVerbs.has(nextW) ||
+              /(ed|ing|en)$/.test(nextW) ||
+              nextW === 'not' ||
+              nextW === 'also' ||
+              nextW === 'actually' ||
+              nextW === 'consistently'
+            ) {
+              verbEndIdx++;
+            } else {
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      let subjectPhrase = '';
+      let mainVerbPhrase = '';
+      if (verbStartIdx > 0) {
+        subjectPhrase = mTokens.slice(0, verbStartIdx).join(' ');
+        mainVerbPhrase = mTokens.slice(verbStartIdx, verbEndIdx + 1).join(' ');
+      } else {
+        subjectPhrase = mTokens.slice(0, Math.min(3, mTokens.length)).join(' ');
+        mainVerbPhrase = mTokens.slice(Math.min(3, mTokens.length), Math.min(5, mTokens.length)).join(' ');
+      }
+
+      // Detect Structural Patterns & Clauses
+      const components = [];
+      if (introLead) {
+        const role = /^To\s+/i.test(introLead)
+          ? '부정사 부사구 (목적: ~하기 위해)'
+          : /^(When|As|While|If|Although)\b/i.test(introLead)
+          ? '부사절 (시간·조건·배경)'
+          : /^(Looking|Using|Establishing|Shifting)\b/i.test(introLead)
+          ? '분사구문 (부대상황·배경)'
+          : '문두 전치사구/배경 부사구';
+        components.push({ role, segment: introLead });
+      }
+
+      if (subjectPhrase) {
+        components.push({
+          role: '주절 주어부 (Subject · S)',
+          segment: subjectPhrase
+        });
+      }
+      if (mainVerbPhrase) {
+        components.push({
+          role: '주절 본동사부 (Main Verb · V)',
+          segment: mainVerbPhrase
+        });
+      }
+
+      // Check relative / subordinate clauses inside the sentence
+      const foundConnectors = [];
+      clauseConnectors.forEach(conn => {
+        const reg = new RegExp(`\\b(${conn})\\b\\s+([^.,;]+)`, 'i');
+        const m = clean.match(reg);
+        if (m) {
+          foundConnectors.push(m[1]);
+          const cWord = m[1].toLowerCase();
+          let roleLabel = '종속절/연결절';
+          if (['who', 'which', 'that', 'where', 'whose'].includes(cWord)) {
+            roleLabel = `관계사절 / 명사절 (${m[1]}절)`;
+          } else if (['as', 'while', 'when', 'before', 'after', 'until'].includes(cWord)) {
+            roleLabel = `부사절 (${m[1]}절 — 시간·동시·이유)`;
+          } else if (['so that'].includes(cWord)) {
+            roleLabel = `목적 부사절 (so that ~할 수 있도록)`;
+          }
+          components.push({
+            role: roleLabel,
+            segment: m[0].trim()
+          });
+        }
+      });
+
+      // Check to-infinitive phrases
+      const infMatch = clean.match(/\bto\s+[a-z]{3,}\s+[^.,;]{4,35}/i);
+      if (infMatch) {
+        components.push({
+          role: 'to부정사구 (목적/수식/보어)',
+          segment: infMatch[0].trim()
+        });
+      }
+
+      const sentenceType =
+        foundConnectors.length > 0
+          ? `복문 (Complex Sentence · 절 연결어: ${foundConnectors.slice(0, 3).join(', ')})`
+          : words.length > 22
+          ? '확장 단문 (수식어구가 결합된 장문)'
+          : '단문 (Simple Sentence)';
+
+      // Highlight S, V, and connectors in the target sentence HTML
+      let highlightedHtml = escapeHtml(clean);
+      if (subjectPhrase) {
+        const sReg = new RegExp(escapeRegExp(escapeHtml(subjectPhrase)));
+        highlightedHtml = highlightedHtml.replace(
+          sReg,
+          `<span class="gram-s" title="주어부(S)">[S] ${escapeHtml(subjectPhrase)}</span>`
+        );
+      }
+      if (mainVerbPhrase) {
+        const vReg = new RegExp(`\\b${escapeRegExp(escapeHtml(mainVerbPhrase))}\\b`);
+        highlightedHtml = highlightedHtml.replace(
+          vReg,
+          `<span class="gram-v" title="본동사(V)">[V] ${escapeHtml(mainVerbPhrase)}</span>`
+        );
+      }
+
+      return {
+        sentenceType,
+        subjectPhrase,
+        mainVerbPhrase,
+        highlightedHtml,
+        components
+      };
+    }
+
+    async function analyzeSentenceGrammar(sentence) {
+      const clean = (sentence || '').trim();
+      if (!clean) return;
+
+      state.currentGrammarSentence = clean;
+      renderArticle(); // highlight active sentence in article
+
+      const container = document.getElementById('grammarResultContainer');
+      const ruleResult = performRuleBasedGrammarAnalysis(clean);
+
+      container.innerHTML = `
+        <div class="grammar-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="tag-pill guess">${escapeHtml(ruleResult.sentenceType)}</span>
+            <button class="btn btn-xs" onclick="speakText('${escapeHtml(clean).replace(/'/g, "\\'")}')">🔊 문장 듣기</button>
+          </div>
+
+          <div class="grammar-target-sentence">
+            ${ruleResult.highlightedHtml}
+          </div>
+
+          <div id="grammarKoTransBox" style="background:var(--primary-soft); border-left:3px solid var(--primary); padding:8px 10px; border-radius:4px; font-size:0.84rem; color:#1e3a8a; margin-bottom:10px;">
+            🇰🇷 문장 해석 불러오는 중...
+          </div>
+
+          <div style="font-size:0.8rem; font-weight:800; color:var(--text); margin-bottom:6px;">
+            🧩 구문 · 문법 구성요소 분석 (기본 규칙 엔진)
+          </div>
+          <div class="grammar-component-list">
+            ${ruleResult.components
+              .map(
+                c => `
+                <div class="grammar-component-item">
+                  <span class="grammar-role-badge">${escapeHtml(c.role)}</span>
+                  <span style="font-weight:600; color:var(--text);">${escapeHtml(c.segment)}</span>
+                </div>
+              `
+              )
+              .join('')}
+          </div>
+
+          <div style="margin-top:12px; padding-top:10px; border-top:1px dashed var(--border);">
+            <button class="btn btn-sm btn-purple" style="width:100%;" onclick="runAiGrammarAnalysis('${escapeHtml(clean).replace(/'/g, "\\'")}')">
+              🤖 ${state.aiConfig.apiKey ? 'AI 정밀 구문·문법 해설 및 추천 청크 추출' : 'AI 정밀 문법 분석 (API 키 설정 시 활성)'}
+            </button>
+            <div id="aiGrammarResultBox" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      `;
+
+      const koTrans = await fetchKoreanTranslation(clean);
+      const koBox = document.getElementById('grammarKoTransBox');
+      if (koBox) {
+        koBox.innerHTML = `🇰🇷 <strong>해석:</strong> ${escapeHtml(koTrans || '번역을 불러올 수 없습니다.')}`;
+      }
+
+      if (state.aiConfig.apiKey) {
+        runAiGrammarAnalysis(clean);
+      }
+    }
+
+    // =========================================================================
+    // 11. Hybrid AI Calls (Gemini / OpenAI) for Grammar & Context Explanation
+    // =========================================================================
+    async function callHybridLLM(promptText) {
+      const { provider, apiKey } = state.aiConfig;
+      if (!apiKey) {
+        throw new Error('NO_API_KEY');
+      }
+
+      if (provider === 'gemini') {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }]
+          })
+        });
+        if (!res.ok) throw new Error(`Gemini API 오류 (${res.status})`);
+        const data = await res.json();
+        return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      } else {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: promptText }],
+            temperature: 0.3
+          })
+        });
+        if (!res.ok) throw new Error(`OpenAI API 오류 (${res.status})`);
+        const data = await res.json();
+        return data?.choices?.[0]?.message?.content || '';
+      }
+    }
+
+    async function runAiGrammarAnalysis(sentence) {
+      if (!state.aiConfig.apiKey) {
+        openModal('aiModal');
+        showToast('상단 [AI 설정]에서 Gemini 또는 OpenAI API 키를 입력하면 AI 정밀 분석이 활성화됩니다.');
+        return;
+      }
+
+      const outBox = document.getElementById('aiGrammarResultBox');
+      if (!outBox) return;
+      outBox.innerHTML = `<div style="font-size:0.8rem; color:var(--purple); font-weight:600;">🤖 AI가 문장 구조와 핵심 청크를 정밀 분석 중입니다...</div>`;
+
+      const prompt = `다음 영어 기사 문장을 한국인 영어 학습자를 위해 분석해 주세요.
+문장: "${sentence}"
+
+아래 형식으로 간결하게 답변해 주세요:
+1. [주어(S)와 본동사(V)]: 주절의 주어와 본동사를 명확히 짚어주기
+2. [의미 단위 끊어 읽기 & 직독직해]: 슬래시(/)로 끊고 각 덩어리 뜻 풀이
+3. [핵심 문법/구문 포인트]: 관계사절, 분사구문, 전치사구 등 핵심 구조 2가지 설명
+4. [추천 청크 2개]: 이 문장에서 외워두면 좋은 동사구/연어(3~5단어) 2개와 뜻`;
+
+      try {
+        const reply = await callHybridLLM(prompt);
+        outBox.innerHTML = `
+          <div style="background:var(--surface); border:1px solid #ddd6fe; border-radius:var(--radius-sm); padding:10px; font-size:0.81rem; white-space:pre-wrap; line-height:1.6;">${escapeHtml(reply)}</div>
+        `;
+      } catch (err) {
+        outBox.innerHTML = `<div style="color:var(--danger); font-size:0.8rem;">AI 호출 실패: ${escapeHtml(err.message)} (API 키를 확인해 주세요)</div>`;
+      }
+    }
+
+    async function explainExpressionWithAI(expr) {
+      const box = document.getElementById('aiDictExplainBox');
+      if (!box) return;
+      box.innerHTML = `<span style="color:var(--purple);">🤖 AI 문맥 해설 생성 중...</span>`;
+      const prompt = `영어 기사 문장 "${state.lastSelection.sentence}"에서 쓰인 표현 "${expr}"의 문맥상 정확한 뜻, 뉘앙스, 그리고 실전 영작에서 함께 자주 쓰이는 연어(Collocation) 예문 1개를 4줄 이내로 설명해 주세요.`;
+      try {
+        const reply = await callHybridLLM(prompt);
+        box.innerHTML = `<div style="background:var(--surface); border:1px solid #ddd6fe; padding:8px; border-radius:6px; white-space:pre-wrap;">${escapeHtml(reply)}</div>`;
+      } catch (err) {
+        box.innerHTML = `<span style="color:var(--danger);">오류: ${escapeHtml(err.message)}</span>`;
+      }
+    }
+
+    // =========================================================================
+    // 12. Step 1 Context Guessing & Step Navigation
+    // =========================================================================
+    function addContextGuess(type) {
+      const popover = document.getElementById('selectionPopover');
+      const text = (popover.dataset.selected || '').trim();
+      const note = document.getElementById('popoverGuessNote').value.trim();
+      if (!text) return;
+
+      const existingIdx = state.contextGuesses.findIndex(
+        g => g.text.toLowerCase() === text.toLowerCase()
+      );
+      const entry = {
+        id: Date.now().toString(),
+        text,
+        type,
+        note
+      };
+
+      if (existingIdx >= 0) {
+        state.contextGuesses[existingIdx] = entry;
+      } else {
+        state.contextGuesses.unshift(entry);
+      }
+
+      document.getElementById('chkContextGuess').checked = true;
+      hideSelectionPopover();
+      window.getSelection()?.removeAllRanges();
+      saveCurrentArticleState();
+      renderArticle();
+      showToast(`문맥 추측 마킹 추가: "${text}"`);
+    }
+
+    function removeContextGuess(id) {
+      state.contextGuesses = state.contextGuesses.filter(g => g.id !== id);
+      saveCurrentArticleState();
+      renderArticle();
+    }
+
+    function renderGuessList() {
+      const listEl = document.getElementById('guessList');
+      document.getElementById('guessCount').textContent = state.contextGuesses.length;
+
+      if (state.contextGuesses.length === 0) {
+        listEl.innerHTML = `
+          <div style="font-size:0.8rem; color:var(--text-light); text-align:center; padding:14px 8px;">
+            1독 중 모르는 단어나 어구를 마우스로 드래그하면 사전을 찾는 대신 <strong>긍정/부정/의미 추측 마킹</strong>을 남길 수 있습니다.
+          </div>
+        `;
+        return;
+      }
+
+      const labelMap = {
+        pos: '➕ 긍정',
+        neg: '➖ 부정',
+        guess: '❓ 추측'
+      };
+
+      listEl.innerHTML = state.contextGuesses
+        .map(item => `
+          <div class="guess-item">
+            <div class="guess-item-left">
+              <div>
+                <span class="tag-pill ${item.type}">${labelMap[item.type] || '추측'}</span>
+                <span class="guess-word">${escapeHtml(item.text)}</span>
+              </div>
+              ${item.note ? `<div class="guess-note">추측 뜻: ${escapeHtml(item.note)}</div>` : ''}
+            </div>
+            <button class="btn btn-sm" onclick="removeContextGuess('${item.id}')" title="삭제">✕</button>
+          </div>
+        `)
+        .join('');
+    }
+
+    function switchStep2SubTab(subTab) {
+      state.step2SubTab = subTab;
+      document.querySelectorAll('.sidebar-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.s2tab === subTab);
+      });
+      document.getElementById('s2PaneDict').style.display = subTab === 'dict' ? 'block' : 'none';
+      document.getElementById('s2PaneChunks').style.display = subTab === 'chunks' ? 'block' : 'none';
+      document.getElementById('s2PaneGrammar').style.display = subTab === 'grammar' ? 'block' : 'none';
+    }
+
+    function switchStep(stepNum) {
+      // Stop continuous TTS if leaving Step 3
+      if (state.currentStep === 3 && stepNum !== 3 && state.tts.playing) {
+        stopArticleTts();
+      }
+
+      state.currentStep = stepNum;
+      document.querySelectorAll('.step-tab').forEach(tab => {
+        tab.classList.toggle('active', Number(tab.dataset.step) === stepNum);
+      });
+
+      const titleEl = document.getElementById('modeGuideTitle');
+      const subEl = document.getElementById('modeGuideSub');
+      const step1Controls = document.getElementById('step1Controls');
+      const step2Controls = document.getElementById('step2Controls');
+      const step3Controls = document.getElementById('step3Controls');
+      const step4Controls = document.getElementById('step4Controls');
+      const sidebarStep1 = document.getElementById('sidebarStep1');
+      const sidebarStep2 = document.getElementById('sidebarStep2');
+      const sidebarStep3 = document.getElementById('sidebarStep3');
+      const sidebarStep4 = document.getElementById('sidebarStep4');
+      const bodyEl = document.getElementById('articleBody');
+
+      step1Controls.style.display = stepNum === 1 ? 'flex' : 'none';
+      step2Controls.style.display = stepNum === 2 ? 'flex' : 'none';
+      if (step3Controls) step3Controls.style.display = stepNum === 3 ? 'flex' : 'none';
+      if (step4Controls) step4Controls.style.display = stepNum === 4 ? 'flex' : 'none';
+
+      sidebarStep1.style.display = stepNum === 1 ? 'block' : 'none';
+      sidebarStep2.style.display = stepNum === 2 ? 'block' : 'none';
+      if (sidebarStep3) sidebarStep3.style.display = stepNum === 3 ? 'block' : 'none';
+      if (sidebarStep4) sidebarStep4.style.display = stepNum === 4 ? 'block' : 'none';
+
+      if (stepNum === 1) {
+        titleEl.textContent = '① 1독(Skimming) 모드 — 사전 없이 논리 흐름만 파악';
+        subEl.textContent = '헤드라인, 첫 1~2문단, 각 소제목 첫 문장만 먼저 읽으며 핵심(Main Idea)을 잡으세요. 모르는 단어는 문맥(긍정/부정)으로 추측합니다.';
+        setSkimView(state.skimView);
+      } else if (stepNum === 2) {
+        titleEl.textContent = '② 2독(Scanning & Mining) — 표현 중심 청크(3~5개) 수집 & 문법 분석';
+        subEl.textContent = '단어가 아니라 동사구·전치사구·연어(Collocation) 단위로 드래그해 뜻을 확인하고 3~5개를 수집하세요. 문장 우측 [🔬 문법]으로 구조를 분석합니다.';
+        bodyEl.classList.remove('skim-mode-dim', 'skim-mode-only');
+        renderStep1GuessVerifyBar();
+        renderChunkList();
+      } else if (stepNum === 3) {
+        titleEl.textContent = '③ 3독(Shadowing / Read Aloud) — 호흡 단위(/) 끊어 읽기 & S-V 직독직해 체화';
+        subEl.textContent = '의미 덩어리(/) 단위로 끊어 소리 내어 읽으며 주어([S])와 본동사([V])를 즉각 연결하세요. 각 문장의 [🔊 읽기] 또는 우측 플레이어로 섀도잉할 수 있습니다.';
+        bodyEl.classList.remove('skim-mode-dim', 'skim-mode-only');
+      } else if (stepNum === 4) {
+        titleEl.textContent = '④ 1문장 요약(1-Sentence Summary) — 기사를 덮고 수집한 청크로 인출(Retrieval)';
+        subEl.textContent = '기사 본문을 가린 상태에서, 2독 때 수집한 표현(Chunk) 중 최소 1개를 반드시 포함하여 영어 1문장으로 핵심을 요약해 보세요.';
+        bodyEl.classList.remove('skim-mode-dim', 'skim-mode-only');
+        state.step4CoverArticle = true;
+        updateArticleCoverButtonsUI();
+      }
+
+      renderArticle();
+    }
+
+    // =========================================================================
+    // 12-B. Step 3: Breath-Unit Slash (/), Inline S-V Highlight & TTS Player
+    // =========================================================================
+    function renderStep3Sentence(sentenceText) {
+      let html = renderSentenceWithHighlights(sentenceText);
+
+      // 1) Optional Subject [S] & Main Verb [V] inline highlight
+      if (state.step3ShowSV) {
+        const parsed = performRuleBasedGrammarAnalysis(sentenceText);
+        if (parsed.subjectPhrase) {
+          const sReg = new RegExp(`(${escapeRegExp(escapeHtml(parsed.subjectPhrase))})`);
+          html = html.replace(
+            sReg,
+            `<span class="gram-s" title="주절 주어(S)">[S] $1</span>`
+          );
+        }
+        if (parsed.mainVerbPhrase) {
+          const vReg = new RegExp(`\\b(${escapeRegExp(escapeHtml(parsed.mainVerbPhrase))})\\b`);
+          html = html.replace(
+            vReg,
+            `<span class="gram-v" title="주절 본동사(V)">[V] $1</span>`
+          );
+        }
+      }
+
+      // 2) Optional Breath-group Slash (/) chunking
+      if (state.step3ShowSlash) {
+        html = insertBreathSlashesInHtml(html);
+      }
+
+      return html;
+    }
+
+    function insertBreathSlashesInHtml(htmlString) {
+      // Split by HTML tags so we only insert slashes inside text nodes (not inside tag attributes)
+      const parts = htmlString.split(/(<[^>]+>)/g);
+      const slashBadge = '<span class="breath-slash">/</span>';
+
+      return parts
+        .map(part => {
+          if (part.startsWith('<')) return part;
+          let t = part;
+          // Insert slash after commas/semicolons followed by space
+          t = t.replace(/([,;])\s+/g, `$1 ${slashBadge} `);
+          // Insert slash before subordinate/relative clause connectors
+          t = t.replace(
+            /\s+\b(which|who|whose|where|although|though|because|since|while|whereas|unless|until|so that)\b/gi,
+            ` ${slashBadge} $1`
+          );
+          // Insert slash before to-infinitive phrase or major prepositional boundary when preceded by 3+ chars
+          t = t.replace(
+            /([a-z]{4,})\s+\b(in order to|to\s+[a-z]{4,}|through|amid|despite|under|between|across|without|during)\b/gi,
+            `$1 ${slashBadge} $2`
+          );
+          return t;
+        })
+        .join('');
+    }
+
+    function toggleStep3Slash() {
+      state.step3ShowSlash = !state.step3ShowSlash;
+      const btn = document.getElementById('step3SlashBtn') || document.getElementById('toggleSlashBtn');
+      if (btn) {
+        btn.classList.toggle('btn-primary', state.step3ShowSlash);
+        btn.textContent = state.step3ShowSlash
+          ? '✂️ 의미 단위 끊어 읽기( / ) ON'
+          : '✂️ 의미 단위 끊어 읽기( / ) OFF';
+      }
+      renderArticle();
+    }
+
+    function toggleStep3SV() {
+      state.step3ShowSV = !state.step3ShowSV;
+      const btn = document.getElementById('step3SVBtn') || document.getElementById('toggleSvBtn');
+      if (btn) {
+        btn.classList.toggle('btn-primary', state.step3ShowSV);
+        btn.textContent = state.step3ShowSV
+          ? '🎯 주어[S]·본동사[V] 표시 ON'
+          : '🎯 주어[S]·본동사[V] 표시 OFF';
+      }
+      renderArticle();
+    }
+
+    function setTtsRate(rate) {
+      state.tts.rate = rate;
+      document.querySelectorAll('[data-rate]').forEach(btn => {
+        btn.classList.toggle('active', Math.abs(Number(btn.dataset.rate) - rate) < 0.01);
+      });
+      if (state.tts.playing) {
+        playTtsAtFlatIndex(state.tts.currentFlatIdx);
+      }
+    }
+
+    function toggleTtsLoop(checked) {
+      state.tts.loopOne = checked;
+      showToast(checked ? '🔁 현재 문장 한 문장씩 반복 섀도잉 모드가 켜졌습니다.' : '한 문장 반복 모드가 해제되었습니다.');
+    }
+
+    function playSingleSentenceTts(bIdx, sIdx) {
+      const idx = state.tts.flatSentences.findIndex(item => item.bIdx === bIdx && item.sIdx === sIdx);
+      if (idx === -1) return;
+      state.tts.playing = true;
+      playTtsAtFlatIndex(idx);
+    }
+
+    function playArticleTts() {
+      if (!state.tts.flatSentences || state.tts.flatSentences.length === 0) {
+        showToast('먼저 읽을 영어 기사를 불러와 주세요.');
+        return;
+      }
+      state.tts.playing = true;
+      const startIdx =
+        state.tts.currentFlatIdx >= 0 && state.tts.currentFlatIdx < state.tts.flatSentences.length
+          ? state.tts.currentFlatIdx
+          : 0;
+      playTtsAtFlatIndex(startIdx);
+    }
+
+    function playTtsAtFlatIndex(flatIdx) {
+      if (!('speechSynthesis' in window)) {
+        showToast('이 브라우저는 음성 합성(TTS)을 지원하지 않습니다.');
+        return;
+      }
+      const list = state.tts.flatSentences;
+      if (!list || flatIdx < 0 || flatIdx >= list.length) {
+        stopArticleTts();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      state.tts.currentFlatIdx = flatIdx;
+      const item = list[flatIdx];
+
+      updateStep3ActiveSentenceCard(item.text, flatIdx, list.length);
+      renderArticle();
+
+      const utter = new SpeechSynthesisUtterance(item.text);
+      utter.lang = 'en-US';
+      utter.rate = state.tts.rate || 0.95;
+
+      utter.onend = () => {
+        if (!state.tts.playing) return;
+        if (state.tts.loopOne) {
+          playTtsAtFlatIndex(state.tts.currentFlatIdx);
+        } else if (state.tts.currentFlatIdx + 1 < state.tts.flatSentences.length) {
+          playTtsAtFlatIndex(state.tts.currentFlatIdx + 1);
+        } else {
+          state.tts.playing = false;
+          renderArticle();
+          showToast('🎙️ 전체 기사 3독 낭독이 완료되었습니다!');
+        }
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    function pauseOrResumeTts() {
+      if (!('speechSynthesis' in window)) return;
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+        showToast('▶ 낭독을 재개합니다.');
+      } else if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause();
+        showToast('⏸ 낭독이 일시정지되었습니다.');
+      } else {
+        playArticleTts();
+      }
+    }
+
+    function stopArticleTts() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      state.tts.playing = false;
+      renderArticle();
+    }
+
+    function stepTtsSentence(delta) {
+      const list = state.tts.flatSentences;
+      if (!list || list.length === 0) return;
+      const nextIdx = Math.max(0, Math.min(list.length - 1, state.tts.currentFlatIdx + delta));
+      state.tts.playing = true;
+      playTtsAtFlatIndex(nextIdx);
+    }
+
+    function updateStep3ActiveSentenceCard(sentenceText, idx, total) {
+      const badge = document.getElementById('ttsProgressBadge');
+      if (badge) badge.textContent = `문장 ${idx + 1} / ${total}`;
+      const box =
+        document.getElementById('ttsCurrentSentenceBox') ||
+        document.getElementById('step3ActiveSentenceBox');
+      if (!box) return;
+      const parsed = performRuleBasedGrammarAnalysis(sentenceText);
+      const slashed = insertBreathSlashesInHtml(parsed.highlightedHtml);
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+          <span>🎙️ 문장 ${idx + 1} / ${total}</span>
+          <span>속도 ${state.tts.rate}x</span>
+        </div>
+        <div style="font-family:var(--font-serif); font-size:0.95rem; color:var(--text); line-height:1.7;">
+          ${slashed}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 12-C. Step 4: 1-Sentence Summary Retrieval & Real-Time Chunk Validator
+    // =========================================================================
+    function toggleArticleCover() {
+      state.step4CoverArticle = !state.step4CoverArticle;
+      updateArticleCoverButtonsUI();
+      renderArticle();
+    }
+
+    function peekArticle5Seconds() {
+      if (!state.step4CoverArticle) return;
+      state.step4CoverArticle = false;
+      updateArticleCoverButtonsUI();
+      renderArticle();
+      showToast('👀 5초 동안 기사 본문을 확인합니다. 키워드만 빠르게 스캔하세요!');
+      setTimeout(() => {
+        if (state.currentStep === 4) {
+          state.step4CoverArticle = true;
+          updateArticleCoverButtonsUI();
+          renderArticle();
+        }
+      }, 5000);
+    }
+
+    function updateArticleCoverButtonsUI() {
+      const btn = document.getElementById('toggleCoverBtn');
+      const bannerBtn = document.getElementById('coverBannerToggleBtn');
+      if (btn) {
+        btn.classList.toggle('active', state.step4CoverArticle);
+        btn.textContent = state.step4CoverArticle
+          ? '🙈 기사 본문 가리기 ON (인출 모드)'
+          : '👁️ 기사 본문 보기 중 (클릭 시 가리기)';
+      }
+      if (bannerBtn) {
+        bannerBtn.textContent = state.step4CoverArticle
+          ? '👁️ 본문 가리기 해제'
+          : '🙈 다시 본문 가리기';
+      }
+    }
+
+    function checkChunkUsedInText(chunkExpr, userText) {
+      if (!chunkExpr || !userText) return false;
+      const lowerText = userText.toLowerCase();
+      const lowerChunk = chunkExpr.trim().toLowerCase();
+      if (lowerText.includes(lowerChunk)) return true;
+
+      // Flexible stem match: if at least 2 content words (4+ chars stem) of the chunk appear in the sentence
+      const contentWords = lowerChunk
+        .split(/\s+/)
+        .map(w => w.replace(/[^a-z]/g, ''))
+        .filter(w => w.length >= 3 && !STOPWORDS.has(w));
+
+      if (contentWords.length === 0) return false;
+      const matchedCount = contentWords.filter(cw => {
+        const stem = cw.length >= 5 ? cw.slice(0, cw.length - 1) : cw;
+        return lowerText.includes(stem);
+      }).length;
+
+      return contentWords.length === 1 ? matchedCount >= 1 : matchedCount >= Math.min(2, contentWords.length);
+    }
+
+    function renderStep4Sidebar() {
+      const chipsContainer = document.getElementById('step4ChunkChipsList');
+      const summaryInput = document.getElementById('summarySentenceInput');
+      if (!chipsContainer || !summaryInput) return;
+
+      if (summaryInput.value !== state.summaryText && state.summaryText) {
+        summaryInput.value = state.summaryText;
+      }
+
+      if (state.chunks.length === 0) {
+        chipsContainer.innerHTML = `
+          <div style="font-size:0.79rem; color:var(--text-muted); padding:8px; background:var(--surface-alt); border-radius:var(--radius-sm);">
+            아직 2독에서 수집한 청크가 없습니다. <button type="button" class="btn btn-xs btn-primary" onclick="switchStep(2)">② 2독으로 이동</button>하여 표현 3~5개를 먼저 수집해 보세요.
+          </div>
+        `;
+      } else {
+        const currentSummary = summaryInput.value || '';
+        chipsContainer.innerHTML = state.chunks
+          .map(chunk => {
+            const used = checkChunkUsedInText(chunk.expr, currentSummary);
+            const safeExpr = escapeHtml(chunk.expr).replace(/'/g, "\\'");
+            return `
+              <button type="button" class="chunk-usage-chip ${used ? 'used' : ''}" onclick="insertChunkIntoSummary('${safeExpr}')" title="클릭하여 요약문에 삽입 (${escapeHtml(chunk.meaningKo)})">
+                <span>${used ? '✅' : '➕'}</span>
+                <span>${escapeHtml(chunk.expr)}</span>
+              </button>
+            `;
+          })
+          .join('');
+      }
+
+      onSummaryInputChanged(false);
+    }
+
+    function insertChunkIntoSummary(expr) {
+      const input = document.getElementById('summarySentenceInput');
+      if (!input) return;
+      const cur = input.value;
+      const needsSpace = cur.length > 0 && !/\s$/.test(cur);
+      input.value = `${cur}${needsSpace ? ' ' : ''}${expr} `;
+      input.focus();
+      onSummaryInputChanged(true);
+    }
+
+    function onSummaryInputChanged(shouldSave = true) {
+      const input = document.getElementById('summarySentenceInput');
+      if (!input) return;
+      const val = input.value;
+      state.summaryText = val;
+      if (shouldSave) saveCurrentArticleState();
+
+      const usedChunks = state.chunks.filter(c => checkChunkUsedInText(c.expr, val));
+      const words = val.trim().split(/\s+/).filter(Boolean);
+      const sentenceSplits = splitIntoSentences(val);
+      const isOneValidSentence = words.length >= 6 && sentenceSplits.length <= 2;
+
+      // Update chunk chips highlight
+      const chipsContainer = document.getElementById('step4ChunkChipsList');
+      if (chipsContainer && state.chunks.length > 0) {
+        chipsContainer.innerHTML = state.chunks
+          .map(chunk => {
+            const used = checkChunkUsedInText(chunk.expr, val);
+            const safeExpr = escapeHtml(chunk.expr).replace(/'/g, "\\'");
+            return `
+              <button type="button" class="chunk-usage-chip ${used ? 'used' : ''}" onclick="insertChunkIntoSummary('${safeExpr}')" title="클릭하여 요약문에 삽입 (${escapeHtml(chunk.meaningKo)})">
+                <span>${used ? '✅' : '➕'}</span>
+                <span>${escapeHtml(chunk.expr)}</span>
+              </button>
+            `;
+          })
+          .join('');
+      }
+
+      const chunkRuleEl = document.getElementById('valChunkRule');
+      const sentRuleEl = document.getElementById('valOneSentRule');
+      const topBadgeEl = document.getElementById('summaryChunkUsedBadge');
+
+      if (chunkRuleEl) {
+        const ok = usedChunks.length >= 1;
+        chunkRuleEl.style.color = ok ? 'var(--success)' : 'var(--text-muted)';
+        chunkRuleEl.innerHTML = ok
+          ? `<span>✅</span><span>수집한 청크 <strong>${usedChunks.length}개</strong> 사용됨 (${usedChunks.map(c => escapeHtml(c.expr)).join(', ')})</span>`
+          : `<span>⬜</span><span>수집한 청크 최소 1개 이상 포함 (0/${state.chunks.length}개 사용됨)</span>`;
+      }
+
+      if (sentRuleEl) {
+        sentRuleEl.style.color = isOneValidSentence ? 'var(--success)' : 'var(--text-muted)';
+        sentRuleEl.innerHTML = isOneValidSentence
+          ? `<span>✅</span><span>영어 1문장 길이 충족 (${words.length}단어)</span>`
+          : `<span>⬜</span><span>완전한 영어 1문장 작성 (현재 ${words.length}단어 / 권장 6단어 이상)</span>`;
+      }
+
+      if (topBadgeEl) {
+        if (usedChunks.length >= 1 && isOneValidSentence) {
+          topBadgeEl.className = 'tag-pill chunk';
+          topBadgeEl.textContent = `✅ 청크 ${usedChunks.length}개 포함 완료!`;
+        } else {
+          topBadgeEl.className = 'tag-pill guess';
+          topBadgeEl.textContent = `청크 ${usedChunks.length}개 포함됨`;
+        }
+      }
+    }
+
+    function saveOneSentenceSummary() {
+      const text = (document.getElementById('summarySentenceInput')?.value || '').trim();
+      if (!text || text.split(/\s+/).length < 4) {
+        showToast('영어 1문장 요약문을 4단어 이상 작성해 주세요.');
+        return;
+      }
+
+      const usedChunks = state.chunks.filter(c => checkChunkUsedInText(c.expr, text)).map(c => c.expr);
+      if (state.chunks.length > 0 && usedChunks.length === 0) {
+        showToast('💡 2독에서 수집한 청크(Chunk)를 최소 1개 이상 포함하여 요약해 보세요!');
+      }
+
+      const entry = {
+        id: Date.now().toString(),
+        articleId: state.article.id || 'custom',
+        articleTitle: state.article.title || 'Untitled Article',
+        summary: text,
+        usedChunks,
+        allChunks: state.chunks.map(c => ({ expr: c.expr, meaningKo: c.meaningKo, category: c.category })),
+        createdAt: new Date().toLocaleDateString('ko-KR')
+      };
+
+      const existingIdx = state.weeklyArchive.summaries.findIndex(
+        s => s.articleId === entry.articleId && s.summary === entry.summary
+      );
+      if (existingIdx >= 0) {
+        state.weeklyArchive.summaries[existingIdx] = entry;
+      } else {
+        state.weeklyArchive.summaries.unshift(entry);
+      }
+
+      saveWeeklyArchive();
+      saveCurrentArticleState();
+      updateWeeklyReviewCountUI();
+      showToast('💾 1문장 요약이 주간 복습장에 저장되었습니다!');
+    }
+
+    async function evaluateSummaryHybrid() {
+      const text = (document.getElementById('summarySentenceInput')?.value || '').trim();
+      if (!text) {
+        showToast('먼저 영어 1문장 요약을 입력해 주세요.');
+        return;
+      }
+
+      const box = document.getElementById('summaryFeedbackBox');
+      if (!box) return;
+      box.style.display = 'block';
+
+      const usedChunks = state.chunks.filter(c => checkChunkUsedInText(c.expr, text));
+      const parsed = performRuleBasedGrammarAnalysis(text);
+
+      box.innerHTML = `
+        <div class="grammar-box" style="margin-top:6px;">
+          <div style="font-size:0.8rem; font-weight:800; color:var(--primary); margin-bottom:6px;">
+            📋 1문장 요약 자체 점검 결과
+          </div>
+          <div style="font-size:0.82rem; line-height:1.6; color:var(--text);">
+            • <strong>문장 구조 판별:</strong> ${escapeHtml(parsed.sentenceType)}<br/>
+            • <strong>감지된 주어(S) / 동사(V):</strong> <code>${escapeHtml(parsed.subjectPhrase || '-')}</code> / <code>${escapeHtml(parsed.mainVerbPhrase || '-')}</code><br/>
+            • <strong>활용한 수집 청크:</strong> ${
+              usedChunks.length > 0
+                ? usedChunks.map(c => `<span class="tag-pill chunk">${escapeHtml(c.expr)}</span>`).join(' ')
+                : '<span style="color:var(--danger);">아직 수집한 청크가 포함되지 않았습니다. 위 칩을 눌러 표현을 넣어보세요!</span>'
+            }
+          </div>
+          <div id="aiSummaryFeedbackSubBox" style="margin-top:8px;"></div>
+        </div>
+      `;
+
+      if (state.aiConfig.apiKey) {
+        const subBox = document.getElementById('aiSummaryFeedbackSubBox');
+        subBox.innerHTML = `<div style="font-size:0.8rem; color:var(--purple);">🤖 AI가 기사 핵심 반영 여부와 문법 자연스러움을 첨삭 중입니다...</div>`;
+        const prompt = `기사 제목: "${state.article.title}"
+수집한 청크 목록: ${state.chunks.map(c => c.expr).join(', ') || '없음'}
+학습자가 작성한 1문장 영어 요약: "${text}"
+
+다음 3가지를 한국어로 간결하게 피드백해 주세요:
+1. [문법 및 표현 자연스러움 평가]
+2. [더 세련된 원어민 스타일 교정 문장 1개 (수집한 청크 유지)]
+3. [칭찬 및 한 줄 팁]`;
+        try {
+          const reply = await callHybridLLM(prompt);
+          subBox.innerHTML = `<div style="background:var(--surface); border:1px solid #ddd6fe; border-radius:6px; padding:10px; font-size:0.81rem; white-space:pre-wrap; line-height:1.6;">${escapeHtml(reply)}</div>`;
+        } catch (err) {
+          subBox.innerHTML = `<div style="font-size:0.78rem; color:var(--danger);">AI 첨삭 오류: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+    }
+
+    // =========================================================================
+    // 12-D. Weekly Review Notebook (Friday Review & JSON Backup/Restore)
+    // =========================================================================
+    function loadWeeklyArchive() {
+      try {
+        const raw = localStorage.getItem('eng_tutor_weekly_archive_v4');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state.weeklyArchive.summaries = Array.isArray(parsed.summaries) ? parsed.summaries : [];
+          state.weeklyArchive.practiceSentences = Array.isArray(parsed.practiceSentences)
+            ? parsed.practiceSentences
+            : [];
+        }
+      } catch (e) {
+        console.warn('loadWeeklyArchive error:', e);
+      }
+      updateWeeklyReviewCountUI();
+    }
+
+    function saveWeeklyArchive() {
+      try {
+        localStorage.setItem('eng_tutor_weekly_archive_v4', JSON.stringify(state.weeklyArchive));
+      } catch (e) {
+        console.warn('saveWeeklyArchive error:', e);
+      }
+      updateWeeklyReviewCountUI();
+    }
+
+    function collectAllSavedChunksAcrossArticles() {
+      const map = new Map();
+      // 1) Current article chunks
+      state.chunks.forEach(c => {
+        map.set(c.expr.toLowerCase(), {
+          expr: c.expr,
+          meaningKo: c.meaningKo,
+          category: c.category,
+          articleTitle: state.article.title || '현재 기사'
+        });
+      });
+      // 2) Chunks stored in weekly summaries
+      state.weeklyArchive.summaries.forEach(s => {
+        (s.allChunks || []).forEach(c => {
+          if (!map.has(c.expr.toLowerCase())) {
+            map.set(c.expr.toLowerCase(), {
+              expr: c.expr,
+              meaningKo: c.meaningKo,
+              category: c.category || '청크',
+              articleTitle: s.articleTitle
+            });
+          }
+        });
+      });
+      return Array.from(map.values());
+    }
+
+    function updateWeeklyReviewCountUI() {
+      const badge =
+        document.getElementById('headerArchiveCount') ||
+        document.getElementById('weeklyReviewCount');
+      if (!badge) return;
+      const allChunks = collectAllSavedChunksAcrossArticles();
+      badge.textContent = allChunks.length + state.weeklyArchive.summaries.length;
+    }
+
+    function openReviewModal() {
+      renderReviewModal();
+      openModal('reviewModal');
+    }
+
+    function toggleFlashcardHide() {
+      state.flashcardHideExpr = !state.flashcardHideExpr;
+      const btn = document.getElementById('flashcardToggleBtn');
+      if (btn) {
+        btn.textContent = state.flashcardHideExpr
+          ? '👁️ 영어 표현 보이기 (뜻 보고 인출 테스트 ON)'
+          : '🙈 영어 표현 가리기 (뜻 보고 인출 테스트 OFF)';
+      }
+      renderReviewModal();
+    }
+
+    function renderReviewModal() {
+      const allChunks = collectAllSavedChunksAcrossArticles();
+      const summaries = state.weeklyArchive.summaries;
+      const practices = state.weeklyArchive.practiceSentences;
+
+      const statChunks =
+        document.getElementById('reviewTotalChunksCount') ||
+        document.getElementById('revTotalChunksStat');
+      const statSum =
+        document.getElementById('reviewTotalSummariesCount') ||
+        document.getElementById('revTotalSummariesStat');
+      if (statChunks) statChunks.textContent = `${allChunks.length}`;
+      if (statSum) statSum.textContent = `${summaries.length}`;
+
+      const flashcardsEl =
+        document.getElementById('reviewChunksList') ||
+        document.getElementById('reviewFlashcardsContainer');
+      if (flashcardsEl) {
+        if (allChunks.length === 0) {
+          flashcardsEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); font-size:0.82rem; padding:18px; background:var(--surface-alt); border-radius:var(--radius-sm);">수집된 청크가 없습니다. 기사 학습 중 2독에서 청크를 저장해 보세요!</div>`;
+        } else {
+          flashcardsEl.innerHTML = allChunks
+            .map(c => {
+              const safeExpr = escapeHtml(c.expr).replace(/'/g, "\\'");
+              return `
+                <div class="chunk-card" style="justify-content:space-between;">
+                  <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span class="tag-pill chunk">${escapeHtml(c.category || '청크')}</span>
+                      <button type="button" class="btn btn-xs" onclick="speakText('${safeExpr}')">🔊</button>
+                    </div>
+                    <div class="chunk-expr ${state.flashcardHideExpr ? 'flashcard-hidden-expr' : ''}" style="margin-top:6px;" onclick="this.classList.toggle('flashcard-hidden-expr')">
+                      ${escapeHtml(c.expr)}
+                    </div>
+                    <div class="chunk-meaning" style="margin-top:4px;">🇰🇷 ${escapeHtml(c.meaningKo || '')}</div>
+                  </div>
+                  <div style="font-size:0.72rem; color:var(--text-light); margin-top:6px;">📰 ${escapeHtml(c.articleTitle || '')}</div>
+                </div>
+              `;
+            })
+            .join('');
+        }
+      }
+
+      const practiceEl =
+        document.getElementById('fridayPracticeList') ||
+        document.getElementById('fridayPracticeListContainer');
+      if (practiceEl) {
+        if (practices.length === 0) {
+          practiceEl.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); padding:8px;">아직 작성한 금요일 복습 영작 문장이 없습니다.</div>`;
+        } else {
+          practiceEl.innerHTML = practices
+            .map(
+              p => `
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 10px; background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.83rem;">
+                <div>
+                  <div style="font-weight:700; color:var(--text);">✍️ "${escapeHtml(p.sentence)}"</div>
+                  <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px;">📅 ${escapeHtml(p.createdAt)}</div>
+                </div>
+                <button type="button" class="btn btn-xs" onclick="deleteFridayPracticeSentence('${p.id}')">삭제</button>
+              </div>
+            `
+            )
+            .join('');
+        }
+      }
+
+      const summariesEl =
+        document.getElementById('reviewSummariesList') ||
+        document.getElementById('reviewSummariesListContainer');
+      if (summariesEl) {
+        if (summaries.length === 0) {
+          summariesEl.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); padding:10px; background:var(--surface-alt); border-radius:var(--radius-sm);">아직 저장된 1문장 요약이 없습니다. ④ 1문장 요약 탭에서 요약을 저장해 보세요.</div>`;
+        } else {
+          summariesEl.innerHTML = summaries
+            .map(
+              s => `
+              <div style="padding:10px 12px; background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-sm);">
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">
+                  <strong>📰 ${escapeHtml(s.articleTitle)}</strong>
+                  <span>${escapeHtml(s.createdAt || '')}</span>
+                </div>
+                <div style="font-family:var(--font-serif); font-size:0.92rem; font-weight:700; color:var(--text);">
+                  "${escapeHtml(s.summary)}"
+                </div>
+                ${
+                  s.usedChunks && s.usedChunks.length > 0
+                    ? `<div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
+                        ${s.usedChunks.map(uc => `<span class="tag-pill chunk">✅ ${escapeHtml(uc)}</span>`).join('')}
+                      </div>`
+                    : ''
+                }
+              </div>
+            `
+            )
+            .join('');
+        }
+      }
+    }
+
+    function saveFridayPracticeSentence() {
+      const input = document.getElementById('fridayPracticeInput');
+      if (!input) return;
+      const sentence = input.value.trim();
+      if (!sentence) {
+        showToast('영작한 문장을 입력해 주세요.');
+        return;
+      }
+      state.weeklyArchive.practiceSentences.unshift({
+        id: Date.now().toString(),
+        sentence,
+        createdAt: new Date().toLocaleDateString('ko-KR')
+      });
+      input.value = '';
+      saveWeeklyArchive();
+      renderReviewModal();
+      showToast('✍️ 금요일 복습 영작 문장이 저장되었습니다!');
+    }
+
+    function deleteFridayPracticeSentence(id) {
+      state.weeklyArchive.practiceSentences = state.weeklyArchive.practiceSentences.filter(p => p.id !== id);
+      saveWeeklyArchive();
+      renderReviewModal();
+    }
+
+    function exportLearningDataJson() {
+      const backup = {
+        version: 'v0.04',
+        exportedAt: new Date().toISOString(),
+        domainRules: state.domainRules,
+        weeklyArchive: state.weeklyArchive,
+        currentArticle: state.article,
+        chunks: state.chunks,
+        contextGuesses: state.contextGuesses,
+        mainIdeaNote: state.mainIdeaNote,
+        summaryText: state.summaryText
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `english_tutor_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('💾 학습 기록 JSON 백업 파일이 다운로드되었습니다.');
+    }
+
+    function importLearningDataJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data.domainRules)) {
+            state.domainRules = data.domainRules;
+            saveDomainRules();
+          }
+          if (data.weeklyArchive) {
+            state.weeklyArchive = data.weeklyArchive;
+            saveWeeklyArchive();
+          }
+          if (Array.isArray(data.chunks)) state.chunks = data.chunks;
+          if (Array.isArray(data.contextGuesses)) state.contextGuesses = data.contextGuesses;
+          if (typeof data.mainIdeaNote === 'string') state.mainIdeaNote = data.mainIdeaNote;
+          if (typeof data.summaryText === 'string') state.summaryText = data.summaryText;
+          saveCurrentArticleState();
+          renderArticle();
+          renderReviewModal();
+          showToast('📂 학습 기록 JSON 파일이 성공적으로 복원되었습니다!');
+        } catch (err) {
+          showToast('유효하지 않은 JSON 백업 파일입니다.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // =========================================================================
+    // 13. Persistence (localStorage) & AI Config
+    // =========================================================================
+    function saveCurrentArticleState() {
+      state.mainIdeaNote = document.getElementById('mainIdeaInput').value;
+      const summaryInput = document.getElementById('summarySentenceInput');
+      if (summaryInput) state.summaryText = summaryInput.value;
+
+      const key = `eng_tutor_v2_article_${state.article.id}`;
+      const payload = {
+        mainIdeaNote: state.mainIdeaNote,
+        contextGuesses: state.contextGuesses,
+        chunks: state.chunks,
+        summaryText: state.summaryText
+      };
+      try {
+        localStorage.setItem(key, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('localStorage error:', e);
+      }
+    }
+
+    function loadSavedArticleState(articleId) {
+      const keyV2 = `eng_tutor_v2_article_${articleId}`;
+      const keyV1 = `eng_tutor_v1_article_${articleId}`;
+      try {
+        const raw = localStorage.getItem(keyV2) || localStorage.getItem(keyV1);
+        if (raw) {
+          const data = JSON.parse(raw);
+          state.mainIdeaNote = data.mainIdeaNote || '';
+          state.contextGuesses = Array.isArray(data.contextGuesses) ? data.contextGuesses : [];
+          state.chunks = Array.isArray(data.chunks) ? data.chunks : [];
+          state.summaryText = data.summaryText || '';
+        } else {
+          state.mainIdeaNote = '';
+          state.contextGuesses = [];
+          state.chunks = [];
+          state.summaryText = '';
+        }
+      } catch {
+        state.mainIdeaNote = '';
+        state.contextGuesses = [];
+        state.chunks = [];
+        state.summaryText = '';
+      }
+      document.getElementById('mainIdeaInput').value = state.mainIdeaNote;
+      const summaryInput = document.getElementById('summarySentenceInput');
+      if (summaryInput) summaryInput.value = state.summaryText;
+    }
+
+    function loadAiSettings() {
+      try {
+        const raw = localStorage.getItem('eng_tutor_ai_config');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state.aiConfig.provider = parsed.provider || 'gemini';
+          state.aiConfig.apiKey = parsed.apiKey || '';
+        }
+      } catch {}
+      updateAiStatusBadge();
+    }
+
+    function saveAiSettings() {
+      const provider = document.getElementById('aiProviderSelect').value;
+      const apiKey = document.getElementById('aiApiKeyInput').value.trim();
+      state.aiConfig = { provider, apiKey };
+      localStorage.setItem('eng_tutor_ai_config', JSON.stringify(state.aiConfig));
+      updateAiStatusBadge();
+      closeModal('aiModal');
+      showToast(apiKey ? `AI 하이브리드 모드(${provider.toUpperCase()})가 활성화되었습니다.` : '기본 무료/규칙 모드로 설정되었습니다.');
+    }
+
+    function clearAiSettings() {
+      state.aiConfig = { provider: 'gemini', apiKey: '' };
+      document.getElementById('aiApiKeyInput').value = '';
+      localStorage.removeItem('eng_tutor_ai_config');
+      updateAiStatusBadge();
+      closeModal('aiModal');
+      showToast('API 키가 삭제되어 기본 무료/규칙 모드로 전환되었습니다.');
+    }
+
+    function updateAiStatusBadge() {
+      const btn = document.getElementById('aiStatusBtn');
+      const dot = document.getElementById('aiStatusDot');
+      const txt = document.getElementById('aiStatusText');
+      document.getElementById('aiProviderSelect').value = state.aiConfig.provider;
+      document.getElementById('aiApiKeyInput').value = state.aiConfig.apiKey;
+
+      if (state.aiConfig.apiKey) {
+        btn.classList.add('connected');
+        dot.textContent = '🟢';
+        txt.textContent = `AI 활성 (${state.aiConfig.provider.toUpperCase()})`;
+      } else {
+        btn.classList.remove('connected');
+        dot.textContent = '⚪';
+        txt.textContent = 'AI 설정 (기본 무료 모드)';
+      }
+    }
+
+    // =========================================================================
+    // 14. UI Utilities
+    // =========================================================================
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function setLoading(active, message = '') {
+      const overlay = document.getElementById('loadingOverlay');
+      const articleContainer = document.getElementById('articleContainer');
+      if (message) document.getElementById('loadingText').textContent = message;
+      overlay.classList.toggle('active', active);
+      articleContainer.style.opacity = active ? '0.4' : '1';
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+  </script>
+</body>
+</html>
